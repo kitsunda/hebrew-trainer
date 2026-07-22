@@ -404,6 +404,12 @@ header.top h1{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="vocab.js"></script>
+<script src="lenya-vocab.js"></script>
+<script>
+  if (localStorage.getItem('hebrewTrainer_activeProfile') === 'lenya') {
+    window.VOCAB = window.LENYA_VOCAB;
+  }
+</script>
 <script>
 
 const TOPIC_GROUPS = [
@@ -469,7 +475,7 @@ function localStoreKey(){ return `${STORE_PREFIX}${activeProfile||'nastya'}`; }
 const DEFAULT_STATE = {
   boxes:{}, xp:0, streak:0, bestStreak:0, dayStreak:0, lastDate:null, selectedTopics:null,
   lastGoalDate:null, shields:1, achievements:{}, announcedCollectibles:[], totalCorrectEver:0,
-  due:{}, wrongStreaks:{}, mnemonics:{}
+  due:{}, wrongStreaks:{}, mnemonics:{}, vocabVersion:0
 };
 function normalizeState(candidate){
   if(!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('Некорректный формат прогресса');
@@ -507,7 +513,9 @@ async function loadStateFromCloud(){
   const {data, error} = await supabaseClient.from('trainer_progress').select('state').eq('profile_id', activeProfile).maybeSingle();
   if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
   if(data?.state){
-    STATE = normalizeState(data.state);
+    const needsLenyaReset = activeProfile === 'lenya' && data.state.vocabVersion !== 1;
+    STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
+    if(needsLenyaReset) await saveStateToCloud();
     localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
     selectedTopics = new Set(STATE.selectedTopics || TOPIC_GROUPS.filter(g=>GROUP_COUNTS[g.key]).map(g=>g.key));
     renderTopics(); renderPoolHint(); renderStats(); renderGarden();
