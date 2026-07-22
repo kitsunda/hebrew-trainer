@@ -321,18 +321,17 @@ header.top h1{
 .showcase-scroll::-webkit-scrollbar{display:none;}
 .showcase-item{
   display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; flex:none;
-  width:102px; min-height:122px; background:transparent; border-radius:0; padding:var(--space-2) 0;
+  width:88px; min-height:104px; background:transparent; border-radius:0; padding:4px 0;
   transition:opacity .25s ease, transform .25s var(--ease-out), filter .25s ease;
 }
 .showcase-item.locked{opacity:.42; filter:grayscale(.65); transform:scale(.9);}
 .showcase-item.unlocked{opacity:1; transform:scale(1.05);}
 .showcase-item.just-unlocked{animation:bloomIn .75s var(--ease-out) both;}
 .showcase-icon{width:54px;height:62px; transition:transform .5s var(--ease-out), filter .5s ease;}
-.showcase-item.locked .showcase-icon{width:42px;height:50px; background-image:none; background-color:var(--color-line); border-radius:50% 50% 45% 45%;}
+.showcase-item.locked .showcase-icon{width:42px;height:50px; background-image:none; background-color:transparent; border-radius:0;}
+.showcase-item.locked .showcase-icon svg{opacity:.35;}
 .showcase-icon{background-image:url('icons/achievement-flowers.png'); background-size:1000% 500%; background-repeat:no-repeat; background-position:var(--flower-x) var(--flower-y); border-radius:12px; overflow:hidden;}
 .showcase-icon svg{width:100%;height:100%;display:block;}
-.showcase-name{font-size:11px; font-weight:520; color:var(--color-text); line-height:1.3; max-width:94px;}
-.showcase-item.locked .showcase-name{color:var(--color-text-muted);}
 .showcase-req{font-size:10px; color:var(--color-text-muted); font-weight:500; font-variant-numeric:tabular-nums; font-family:var(--font-mono);}
 .garden-next{display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-2); color:var(--color-text-muted); font-size:12px;}
 .garden-next-stem{width:46px; height:2px; background:linear-gradient(90deg,var(--color-green) var(--next-progress,0%), var(--color-line) var(--next-progress,0%)); border-radius:999px;}
@@ -756,9 +755,11 @@ function renderGarden(justUnlocked=[]){
     const progress = gardenProgress(f);
     const col = f.imageIndex % 10;
     const row = Math.floor(f.imageIndex / 10);
+    const icon = unlocked
+      ? `<div class="showcase-icon" style="--flower-x:${(col*11.111).toFixed(3)}%;--flower-y:${(row*25).toFixed(3)}%;"></div>`
+      : `<div class="showcase-icon">${buildFlowerSVG(6, 'var(--color-line)', true)}</div>`;
     return `<div class="showcase-item ${unlocked?'unlocked':'locked'} ${justUnlocked.includes(f.id)?'just-unlocked':''}" title="${f.desc}">
-      <div class="showcase-icon" style="--flower-x:${(col*11.111).toFixed(3)}%;--flower-y:${(row*25).toFixed(3)}%;"></div>
-      <span class="showcase-name">${f.name}</span>
+      ${icon}
       <span class="showcase-req">${unlocked?'открыто':(index===0 ? progress.label : f.costLabel)}</span>
     </div>`;
   }).join('');
