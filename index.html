@@ -166,12 +166,23 @@ header.top h1{
 .topic-blob:hover,.topic-blob:focus-visible{transform:translate(2px,-2px);}
 .topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translateY(-50%) scale(1.045); filter:blur(10px); opacity:1;}
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
-.topic-blob:nth-child(3n+2){align-self:stretch; align-items:flex-end; text-align:right;}
-.topic-blob:nth-child(3n+2)::before{left:auto; right:0;}
-.topic-blob:nth-child(4n+3){margin-top:0;}
-.topic-blob:nth-child(5n+1){margin-top:3px;}
+.topic-blob.side-right{align-self:stretch; align-items:flex-end; text-align:right;}
+.topic-blob.side-right::before{left:auto; right:0;}
+.topic-blob.with-top-gap{margin-top:3px;}
+.topic-blob.weekly-topic{
+  min-height:112px; margin:0 0 13px; padding:var(--space-5); align-items:center; text-align:center;
+}
+.topic-blob.weekly-topic::before{
+  left:50%; width:min(86vw,300px); height:104px; transform:translate(-50%,-50%);
+  filter:blur(13px); opacity:.96;
+}
+.topic-blob.weekly-topic:hover::before,.topic-blob.weekly-topic:focus-visible::before{
+  transform:translate(-50%,-50%) scale(1.045);
+}
+.weekly-topic .topic-name{font-size:14px; letter-spacing:.045em;}
 .topic-blob.launching{transform:scale(1.025);pointer-events:none;}
 .topic-blob.launching::before{transform:translateY(-50%) scale(1.1);filter:blur(12px);opacity:1;}
+.topic-blob.weekly-topic.launching::before{transform:translate(-50%,-50%) scale(1.1);}
 .topic-name{
   font-family:var(--font-mono); font-size:13px; font-weight:480; letter-spacing:.038em; text-transform:uppercase;
   color:var(--color-text); line-height:1.3;
@@ -478,9 +489,11 @@ body.session-active .stage{min-height:0;overflow:visible;}
   if (localStorage.getItem('hebrewTrainer_activeProfile') === 'lenya') {
     window.VOCAB = window.LENYA_VOCAB;
     window.VERB_FAMILIES = window.LENYA_VERB_FAMILIES;
+    (window.LENYA_DOC_IMPORTS || []).forEach(word=>word.isWeekly=true);
     window.VOCAB.push(...(window.LENYA_DOC_IMPORTS || []));
   } else {
     window.VERB_FAMILIES = window.NASTYA_VERB_FAMILIES;
+    (window.NASTYA_DOC_IMPORTS || []).forEach(word=>word.isWeekly=true);
     window.VOCAB.push(...(window.NASTYA_DOC_IMPORTS || []));
   }
 </script>
@@ -881,7 +894,14 @@ function renderTopics(){
     'radial-gradient(ellipse at 52% 47%, var(--blob-color) 0 34%, color-mix(in srgb,var(--blob-color) 85%,transparent) 51%, transparent 74%)',
     'radial-gradient(circle at 50% 50%, var(--blob-color) 0 32%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)'
   ];
-  el.innerHTML = visible.map(g=>{
+  const weeklyIds = LEARNING_VOCAB.filter(w=>w.isWeekly).map(w=>w.id);
+  const weeklyCount = weeklyIds.length;
+  const weeklyLearned = masteredCount(weeklyIds);
+  const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="--blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:${(weeklyLearned/weeklyCount).toFixed(3)}; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 33%, color-mix(in srgb,var(--blob-color) 84%,transparent) 50%, transparent 73%)">
+    <span class="topic-name">Слова этой недели</span>
+    <span class="topic-meta">${weeklyLearned} из ${weeklyCount}</span>
+  </button>` : '';
+  const topicClouds = visible.map(g=>{
     const index = visible.indexOf(g);
     const on = true;
     const count = GROUP_COUNTS[g.key]||0;
@@ -891,11 +911,14 @@ function renderTopics(){
     const size = TOPIC_BLOB_SIZES[index%TOPIC_BLOB_SIZES.length];
     const color = blobColorFor(g.key);
     const finalOpacity = on ? 1 : .46;
-    return `<button class="topic-blob on" data-key="${g.key}" aria-label="Начать тему «${g.label}» — ${count} ${pluralWords(count)}" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${(index*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
+    const positionClass = index%3===1 ? ' side-right' : '';
+    const gapClass = index%5===0 ? ' with-top-gap' : '';
+    return `<button class="topic-blob on${positionClass}${gapClass}" data-key="${g.key}" aria-label="Начать тему «${g.label}» — ${count} ${pluralWords(count)}" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${((index+1)*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
       <span class="topic-name">${g.label}</span>
       <span class="topic-meta">${learned} из ${count}</span>
     </button>`;
   }).join('');
+  el.innerHTML = weeklyCloud + topicClouds;
   el.querySelectorAll('.topic-blob').forEach(chip=>{
     chip.addEventListener('click', ()=>{
       chip.classList.add('launching');
@@ -904,6 +927,7 @@ function renderTopics(){
   });
 }
 function currentPool(topicKey=null){
+  if(topicKey==='weekly') return LEARNING_VOCAB.filter(w=>w.isWeekly);
   return topicKey ? LEARNING_VOCAB.filter(w=>w.group===topicKey) : LEARNING_VOCAB;
 }
 function renderPoolHint(){
@@ -1028,7 +1052,7 @@ function startSession(topicKey=null){
   if(!pool.length) return;
   const n = selectedLength === 'весь набор' ? pool.length : selectedLength;
   const queue = buildQueue(pool, n);
-  session = { queue, pool, i:0, mode:selectedMode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], fullDeck:selectedLength==='весь набор' };
+  session = { queue, pool, topicKey, i:0, mode:selectedMode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], fullDeck:selectedLength==='весь набор' };
   document.getElementById('setup').style.display = 'none';
   document.getElementById('summary').style.display = 'none';
   document.getElementById('session').style.display = 'flex';
@@ -1051,7 +1075,9 @@ function renderQuestion(){
   const w = session.queue[session.i];
   const stage = document.getElementById('stage');
   stage.className = 'stage question-enter';
-  const groupLabel = TOPIC_GROUPS.find(g=>g.key===w.group)?.label || '';
+  const groupLabel = session.topicKey==='weekly'
+    ? 'Слова этой недели'
+    : (TOPIC_GROUPS.find(g=>g.key===w.group)?.label || '');
   const cardLabel = w.formLabel || groupLabel;
   if(session.mode==='flash') renderFlash(stage, w, cardLabel);
   else if(session.mode==='mc') renderMC(stage, w, cardLabel);
