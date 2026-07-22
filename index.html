@@ -151,8 +151,8 @@ header.top h1{
 }
 .topic-blob::before{
   content:''; position:absolute; z-index:-1; pointer-events:none;
-  left:0; top:50%; transform:translateY(-50%);
-  width:var(--blob-size); height:calc(var(--blob-size) * .68);
+  left:-20px; top:50%; transform:translateY(-50%);
+  width:calc(var(--blob-size) + 40px); height:calc(var(--blob-size) * .72);
   border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
   background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
   filter:blur(10px);
@@ -167,7 +167,7 @@ header.top h1{
 .topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translateY(-50%) scale(1.045); filter:blur(10px); opacity:1;}
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
 .topic-blob:nth-child(3n+2){align-self:stretch; align-items:flex-end; text-align:right;}
-.topic-blob:nth-child(3n+2)::before{left:auto; right:0;}
+.topic-blob:nth-child(3n+2)::before{left:auto; right:-20px;}
 .topic-blob:nth-child(4n+3){margin-top:0;}
 .topic-blob:nth-child(5n+1){margin-top:3px;}
 .topic-blob.launching{transform:scale(1.025);pointer-events:none;}
@@ -189,13 +189,10 @@ header.top h1{
   border:0; padding:0; line-height:1; cursor:pointer;
   transition:transform .25s var(--ease-out), color .2s ease; white-space:nowrap;
 }
-.btn-primary::before{content:'';position:absolute;z-index:-1;inset:2px;border-radius:50%;background:radial-gradient(circle,var(--color-bg) 0 30%,transparent 56%);opacity:.7;}
-.btn-primary svg{width:70px;height:70px;overflow:visible;}
+.btn-primary svg{width:68px;height:68px;overflow:visible;}
 .btn-primary:hover,.btn-primary:focus-visible{transform:translateY(-2px) scale(1.04); color:var(--color-text);}
-.btn-primary:hover svg,.btn-primary:focus-visible svg{animation:orbitTurn 2.6s linear infinite;}
 .btn-primary:active{transform:translateY(0) scale(.94);}
 .btn-primary:disabled{opacity:.35; cursor:not-allowed; transform:none;}
-@keyframes orbitTurn{to{transform:rotate(360deg);}}
 .start-label{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:var(--color-text-muted); text-transform:uppercase;}
 .hint-empty{font-size:10px; color:var(--color-text-muted); font-weight:500; text-align:center; max-width:100px;}
 
@@ -427,19 +424,18 @@ body.session-active .stage{min-height:0;overflow:hidden;}
         <div class="start-col">
           <button class="btn-primary" id="startBtn" aria-label="Начать тренировку" title="Начать тренировку">
             <svg viewBox="0 0 72 72" aria-hidden="true">
-              <g opacity=".95">
-                <circle cx="36" cy="5" r="3.4" fill="var(--color-orange)"/><circle cx="51.5" cy="9" r="3" fill="var(--color-coral)"/>
-                <circle cx="63" cy="20.5" r="3.3" fill="var(--color-yellow)"/><circle cx="67" cy="36" r="2.8" fill="var(--color-blue)"/>
-                <circle cx="63" cy="51.5" r="3.4" fill="var(--color-mint)"/><circle cx="51.5" cy="63" r="3" fill="var(--color-lilac)"/>
-                <circle cx="36" cy="67" r="3.3" fill="var(--color-blue)"/><circle cx="20.5" cy="63" r="2.8" fill="var(--color-coral)"/>
-                <circle cx="9" cy="51.5" r="3.4" fill="var(--color-yellow)"/><circle cx="5" cy="36" r="3" fill="var(--color-orange)"/>
-                <circle cx="9" cy="20.5" r="3.3" fill="var(--color-mint)"/><circle cx="20.5" cy="9" r="2.8" fill="var(--color-lilac)"/>
+              <g fill="currentColor" opacity=".13">
+                <circle cx="36" cy="7" r="1.8"/><circle cx="47" cy="9" r="1.8"/><circle cx="56.5" cy="15.5" r="1.8"/><circle cx="63" cy="25" r="1.8"/>
+                <circle cx="65" cy="36" r="1.8"/><circle cx="63" cy="47" r="1.8"/><circle cx="56.5" cy="56.5" r="1.8"/><circle cx="47" cy="63" r="1.8"/>
+                <circle cx="36" cy="65" r="1.8"/><circle cx="25" cy="63" r="1.8"/><circle cx="15.5" cy="56.5" r="1.8"/><circle cx="9" cy="47" r="1.8"/>
+                <circle cx="7" cy="36" r="1.8"/><circle cx="9" cy="25" r="1.8"/><circle cx="15.5" cy="15.5" r="1.8"/><circle cx="25" cy="9" r="1.8"/>
               </g>
-              <g fill="var(--color-text)" opacity=".28">
-                <circle cx="36" cy="18" r="1.8"/><circle cx="49" cy="23" r="1.8"/><circle cx="54" cy="36" r="1.8"/><circle cx="49" cy="49" r="1.8"/>
-                <circle cx="36" cy="54" r="1.8"/><circle cx="23" cy="49" r="1.8"/><circle cx="18" cy="36" r="1.8"/><circle cx="23" cy="23" r="1.8"/>
+              <g fill="currentColor" opacity=".22">
+                <circle cx="36" cy="19" r="1.9"/><circle cx="44.5" cy="21.3" r="1.9"/><circle cx="50.7" cy="27.5" r="1.9"/><circle cx="53" cy="36" r="1.9"/>
+                <circle cx="50.7" cy="44.5" r="1.9"/><circle cx="44.5" cy="50.7" r="1.9"/><circle cx="36" cy="53" r="1.9"/><circle cx="27.5" cy="50.7" r="1.9"/>
+                <circle cx="21.3" cy="44.5" r="1.9"/><circle cx="19" cy="36" r="1.9"/><circle cx="21.3" cy="27.5" r="1.9"/><circle cx="27.5" cy="21.3" r="1.9"/>
               </g>
-              <circle cx="36" cy="36" r="3.4" fill="var(--color-text)"/>
+              <circle cx="36" cy="36" r="2.8" fill="currentColor"/>
             </svg>
           </button>
           <span class="hint-empty" id="poolHint"></span>
@@ -795,11 +791,11 @@ function renderTopics(){
     '49% 51% 34% 66% / 58% 42% 65% 35%'
   ];
   const blobBackgrounds = [
-    'radial-gradient(circle at 38% 36%, var(--blob-color) 0 34%, color-mix(in srgb,var(--blob-color) 82%,transparent) 50%, transparent 73%)',
-    'radial-gradient(ellipse at 62% 44%, var(--blob-color) 0 35%, color-mix(in srgb,var(--blob-color) 84%,transparent) 51%, transparent 73%)',
-    'radial-gradient(ellipse at 42% 38%, var(--blob-color) 0 33%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)',
-    'radial-gradient(ellipse at 48% 42%, var(--blob-color) 0 36%, color-mix(in srgb,var(--blob-color) 85%,transparent) 52%, transparent 75%)',
-    'radial-gradient(circle at 46% 48%, var(--blob-color) 0 34%, color-mix(in srgb,var(--blob-color) 82%,transparent) 50%, transparent 72%)'
+    'radial-gradient(circle at 50% 46%, var(--blob-color) 0 32%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)',
+    'radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 33%, color-mix(in srgb,var(--blob-color) 84%,transparent) 50%, transparent 73%)',
+    'radial-gradient(ellipse at 48% 46%, var(--blob-color) 0 31%, color-mix(in srgb,var(--blob-color) 82%,transparent) 48%, transparent 71%)',
+    'radial-gradient(ellipse at 52% 47%, var(--blob-color) 0 34%, color-mix(in srgb,var(--blob-color) 85%,transparent) 51%, transparent 74%)',
+    'radial-gradient(circle at 50% 50%, var(--blob-color) 0 32%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)'
   ];
   el.innerHTML = visible.map(g=>{
     const index = visible.indexOf(g);
