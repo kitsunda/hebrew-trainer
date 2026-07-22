@@ -80,6 +80,15 @@ button{font-family:inherit;}
   max-width:460px; margin:0 auto; position:relative; z-index:1;
   padding:calc(24px + env(safe-area-inset-top)) var(--space-5) calc(var(--space-12) + env(safe-area-inset-bottom));
 }
+.profile-gate{min-height:100vh; display:grid; place-items:center; padding:24px; position:relative; z-index:2;}
+.profile-gate-inner{width:min(100%,360px); text-align:center; animation:riseIn .5s var(--ease-out) both;}
+.profile-gate .eyebrow{margin:0 0 10px;}
+.profile-gate h1{font-size:28px; font-weight:500; letter-spacing:-.03em; margin:0 0 8px;}
+.profile-gate p{font-size:13px; color:var(--color-text-muted); margin:0 0 28px;}
+.profile-choices{display:flex; gap:12px; justify-content:center;}
+.profile-choice{flex:1; min-height:56px; border:1px solid var(--color-line); border-radius:18px; background:transparent; color:var(--color-text); font-size:15px; font-weight:550; cursor:pointer; transition:transform .2s var(--ease-out), background .2s ease;}
+.profile-choice:hover,.profile-choice:focus-visible{transform:translateY(-2px); background:rgba(255,255,255,.42);}
+.profile-choice:active{transform:scale(.97);}
 
 /* ---------- MinimalHeader ---------- */
 header.top{display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-5); animation:riseIn .5s var(--ease-out) both;}
@@ -90,6 +99,8 @@ header.top .eyebrow{
 header.top h1{
   font-family:var(--font-sans); font-size:20px; margin:2px 0 0; font-weight:520; letter-spacing:-.01em; color:var(--color-text);
 }
+.profile-switch{border:none; background:none; color:var(--color-text-muted); font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; padding:8px 0 8px 10px;}
+.profile-switch:hover{color:var(--color-text);}
 
 /* ---------- StatsOverview ---------- */
 .stats-hero{margin-bottom:var(--space-8); animation:riseIn .55s .08s var(--ease-out) both;}
@@ -335,12 +346,25 @@ header.top h1{
 
 <div id="toast"></div>
 
-<div class="wrap">
+<section class="profile-gate" id="profileGate" aria-labelledby="profileTitle">
+  <div class="profile-gate-inner">
+    <p class="eyebrow">Hebrew</p>
+    <h1 id="profileTitle">Кто играет?</h1>
+    <p>Выберите свой профиль — прогресс сохранится отдельно.</p>
+    <div class="profile-choices">
+      <button class="profile-choice" type="button" data-profile="nastya">Настя</button>
+      <button class="profile-choice" type="button" data-profile="lenya">Лёня</button>
+    </div>
+  </div>
+</section>
+
+<div class="wrap" id="appWrap">
   <header class="top">
     <div>
       <p class="eyebrow">Hebrew</p>
       <h1>Тренажёр слов</h1>
     </div>
+    <button class="profile-switch" id="profileSwitch" type="button" aria-label="Сменить профиль"></button>
   </header>
 
   <section id="setup">
@@ -390,6 +414,7 @@ header.top h1{
   <section id="summary"></section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="vocab.js"></script>
 <script>
 
@@ -445,7 +470,14 @@ VOCAB.forEach(w=>{
 const GROUP_COUNTS = {};
 VOCAB.forEach(w=>{ GROUP_COUNTS[w.group] = (GROUP_COUNTS[w.group]||0)+1; });
 
-const STORE_KEY = 'hebrewTrainer_v1';
+const STORE_PREFIX = 'hebrewTrainer_v1_';
+const PROFILE_NAMES = {nastya:'Настя', lenya:'Лёня'};
+const SUPABASE_URL = 'https://uplxewnckhvaoarqmutp.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_unv0cdILHE0EP_OPyYfiiw_efsGWPS2';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let activeProfile = localStorage.getItem('hebrewTrainer_activeProfile');
+let cloudSaveTimer = null;
+function localStoreKey(){ return `${STORE_PREFIX}${activeProfile||'nastya'}`; }
 const DEFAULT_STATE = {
   boxes:{}, xp:0, streak:0, bestStreak:0, dayStreak:0, lastDate:null, selectedTopics:null,
   lastGoalDate:null, shields:1, achievements:{}, announcedCollectibles:[], totalCorrectEver:0,
@@ -466,13 +498,35 @@ function normalizeState(candidate){
 }
 function loadState(){
   try{
-    const raw = localStorage.getItem(STORE_KEY);
+    const raw = localStorage.getItem(localStoreKey()) || (activeProfile==='nastya' ? localStorage.getItem('hebrewTrainer_v1') : null);
     if(raw) return normalizeState(JSON.parse(raw));
   }catch(e){}
   return normalizeState({});
 }
 let STATE = loadState();
-function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); }
+function saveState(){
+  localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(saveStateToCloud, 500);
+}
+async function saveStateToCloud(){
+  if(!activeProfile) return;
+  const {error} = await supabaseClient.from('trainer_progress').upsert({profile_id:activeProfile, state:STATE, updated_at:new Date().toISOString()});
+  if(error) console.error('Не удалось сохранить прогресс в облако', error);
+}
+async function loadStateFromCloud(){
+  if(!activeProfile) return;
+  const {data, error} = await supabaseClient.from('trainer_progress').select('state').eq('profile_id', activeProfile).maybeSingle();
+  if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
+  if(data?.state){
+    STATE = normalizeState(data.state);
+    localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
+    selectedTopics = new Set(STATE.selectedTopics || TOPIC_GROUPS.filter(g=>GROUP_COUNTS[g.key]).map(g=>g.key));
+    renderTopics(); renderPoolHint(); renderStats(); renderGarden();
+  } else {
+    await saveStateToCloud();
+  }
+}
 
 function exportProgress(){
   const payload = { app:'hebrew-trainer', version:1, exportedAt:new Date().toISOString(), state:STATE };
@@ -1073,6 +1127,31 @@ function processToastQueue(){
   }, 2200);
 }
 function showToast(msg){ queueToast(msg, 'gold'); }
+function applyProfileUI(){
+  const gate = document.getElementById('profileGate');
+  const app = document.getElementById('appWrap');
+  const switcher = document.getElementById('profileSwitch');
+  const hasProfile = !!activeProfile;
+  gate.style.display = hasProfile ? 'none' : 'grid';
+  app.style.display = hasProfile ? '' : 'none';
+  if(hasProfile){
+    switcher.textContent = PROFILE_NAMES[activeProfile] || activeProfile;
+    loadStateFromCloud();
+  }
+}
+document.querySelectorAll('[data-profile]').forEach(button=>{
+  button.addEventListener('click', ()=>{
+    activeProfile = button.dataset.profile;
+    localStorage.setItem('hebrewTrainer_activeProfile', activeProfile);
+    location.reload();
+  });
+});
+document.getElementById('profileSwitch').addEventListener('click', ()=>{
+  activeProfile = null;
+  localStorage.removeItem('hebrewTrainer_activeProfile');
+  applyProfileUI();
+});
+applyProfileUI();
 document.getElementById('exportProgress').addEventListener('click', exportProgress);
 document.getElementById('importProgress').addEventListener('click', ()=>document.getElementById('progressFile').click());
 document.getElementById('progressFile').addEventListener('change', event=>{
