@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Тренажёр иврита</title>
 <meta name="description" content="Личный тренажёр иврита с интервальными повторениями">
-<meta name="theme-color" content="#eee8dd">
+<meta name="theme-color" content="#efe3cd">
+<meta name="color-scheme" content="light">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Иврит">
@@ -16,6 +19,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-startup-image" href="icons/launch-1125x2436.png" media="(device-width:375px) and (device-height:812px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1170x2532.png" media="(device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1179x2556.png" media="(device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1206x2622.png" media="(device-width:402px) and (device-height:874px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1242x2688.png" media="(device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1290x2796.png" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="icons/launch-1320x2868.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3)">
 <style>
 :root{
   --color-bg:#efe3cd;
@@ -53,12 +63,20 @@
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
+html{
+  background:#efe3cd;
+  color-scheme:light;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior:none;
+}
 body{
   background:var(--color-bg);
   color:var(--color-text);
   font-family:var(--font-sans);
   min-height:100vh;
   overflow-x:hidden;
+  overscroll-behavior-x:none;
+  -webkit-tap-highlight-color:transparent;
   position:relative;
 }
 /* очень слабое зерно поверх фона — CSS-only, без изображений */
@@ -72,8 +90,46 @@ body::before{
 .font-hebrew{font-family:"Arial Hebrew","New Peninim MT","Rubik","Times New Roman","Noto Sans Hebrew",sans-serif; direction:rtl; unicode-bidi:isolate;}
 .mono-label{font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.08em; font-weight:500;}
 
-button{font-family:inherit;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+button{font-family:inherit;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+img,svg{-webkit-user-drag:none;user-select:none;}
+input,textarea{-webkit-user-select:text;user-select:text;}
 :focus-visible{outline:2px solid var(--color-text); outline-offset:5px;}
+
+/* Экран запуска остаётся поверх интерфейса, пока загрузились словари и стили. */
+.boot-splash{
+  position:fixed;inset:0;z-index:1000;display:grid;place-items:center;
+  background:#efe3cd;opacity:1;visibility:visible;
+  transition:opacity .36s var(--ease-out),visibility 0s linear .36s;
+}
+.boot-splash::before{
+  content:'';position:absolute;width:min(76vw,340px);aspect-ratio:1;border-radius:48% 52% 58% 42% / 55% 45% 58% 42%;
+  background:
+    radial-gradient(circle at 36% 28%,rgba(240,101,38,.72),transparent 45%),
+    radial-gradient(circle at 68% 42%,rgba(82,156,201,.56),transparent 46%),
+    radial-gradient(circle at 46% 72%,rgba(240,187,32,.56),transparent 48%),
+    radial-gradient(circle at 66% 76%,rgba(179,179,206,.48),transparent 46%);
+  filter:blur(28px);opacity:.78;
+}
+.boot-splash-mark{position:relative;font-family:"Times New Roman",serif;font-size:clamp(84px,26vw,126px);font-weight:700;line-height:1;color:var(--color-text);}
+body.app-ready .boot-splash{opacity:0;visibility:hidden;pointer-events:none;}
+
+.install-hint{
+  position:fixed;z-index:90;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,24px);
+  width:min(calc(100vw - 40px),420px);padding:30px 26px 24px;text-align:center;
+  opacity:0;visibility:hidden;transition:opacity .32s var(--ease-out),transform .32s var(--ease-out),visibility 0s linear .32s;
+  isolation:isolate;color:var(--color-text);
+}
+.install-hint::before{
+  content:'';position:absolute;z-index:-1;inset:-28px -18px;border-radius:48% 52% 56% 44% / 54% 46% 58% 42%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(240,187,32,.92) 0 24%,rgba(240,187,32,.5) 48%,rgba(240,187,32,0) 76%);
+  filter:blur(13px);
+}
+.install-hint.show{opacity:1;visibility:visible;transform:translate(-50%,0);transition-delay:0s;}
+.install-hint-title{margin:0 0 8px;font-size:16px;font-weight:650;}
+.install-hint-copy{margin:0;font-size:13px;line-height:1.55;color:var(--color-text-muted);}
+.install-hint-copy strong{color:var(--color-text);font-weight:650;}
+.install-hint-close{margin-top:14px;border:0;background:none;padding:7px 12px;color:var(--color-text);font:600 13px var(--font-sans);text-decoration:underline;text-underline-offset:4px;cursor:pointer;}
 
 .wrap{
   max-width:460px; margin:0 auto; position:relative; z-index:1;
@@ -418,6 +474,16 @@ body.session-active .stage{min-height:0;overflow:visible;}
 </style>
 </head>
 <body>
+
+<div class="boot-splash" id="bootSplash" aria-hidden="true">
+  <span class="boot-splash-mark">א</span>
+</div>
+
+<aside class="install-hint" id="installHint" aria-live="polite" aria-label="Как установить приложение">
+  <p class="install-hint-title">Открывай без браузера</p>
+  <p class="install-hint-copy"><strong>Поделиться</strong> → <strong>На экран «Домой»</strong> → включить <strong>«Открывать как веб-приложение»</strong></p>
+  <button class="install-hint-close" id="installHintClose" type="button">Понятно</button>
+</aside>
 
 <div id="toast"></div>
 
@@ -1586,6 +1652,44 @@ function processToastQueue(){
   }, 2200);
 }
 function showToast(msg){ queueToast(msg, 'gold'); }
+
+function isStandaloneApp(){
+  return window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+}
+function isIOSSafari(){
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const alternateBrowser = /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  return ios && /Safari/.test(ua) && !alternateBrowser;
+}
+function setupInstallHint(){
+  const hint = document.getElementById('installHint');
+  const close = document.getElementById('installHintClose');
+  if(!hint || !close || isStandaloneApp() || !isIOSSafari()) return;
+  let dismissed = false;
+  try{ dismissed = localStorage.getItem('hebrewTrainer_installHintSeen')==='1'; }catch(error){}
+  if(dismissed) return;
+  const showTimer = setTimeout(()=>hint.classList.add('show'),1400);
+  close.addEventListener('click',()=>{
+    clearTimeout(showTimer);
+    hint.classList.remove('show');
+    try{ localStorage.setItem('hebrewTrainer_installHintSeen','1'); }catch(error){}
+  });
+}
+function finishBootSplash(){
+  const elapsed = performance.now();
+  setTimeout(()=>document.body.classList.add('app-ready'), Math.max(0,420-elapsed));
+}
+if(document.readyState==='complete') finishBootSplash();
+else window.addEventListener('load',finishBootSplash,{once:true});
+setTimeout(()=>document.body.classList.add('app-ready'),2600);
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('Офлайн-режим не включился',error));
+  },{once:true});
+}
+
 function applyProfileUI(){
   const gate = document.getElementById('profileGate');
   const app = document.getElementById('appWrap');
@@ -1612,6 +1716,7 @@ document.getElementById('profileSwitch').addEventListener('click', ()=>{
   applyProfileUI();
 });
 applyProfileUI();
+setupInstallHint();
 </script>
 </body>
 </html>

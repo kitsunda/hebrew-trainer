@@ -3,11 +3,15 @@
   "short_name": "Иврит",
   "description": "Личный тренажёр иврита с интервальными повторениями",
   "lang": "ru",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f4ead5",
-  "theme_color": "#f4ead5",
+  "orientation": "portrait-primary",
+  "background_color": "#efe3cd",
+  "theme_color": "#efe3cd",
+  "categories": ["education"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -19,7 +23,7 @@
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
