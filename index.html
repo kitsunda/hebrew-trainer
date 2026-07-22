@@ -78,11 +78,11 @@ button{font-family:inherit;}
 
 .wrap{
   max-width:460px; margin:0 auto; position:relative; z-index:1;
-  padding:calc(var(--space-8) + env(safe-area-inset-top)) var(--space-5) calc(var(--space-12) + env(safe-area-inset-bottom));
+  padding:calc(24px + env(safe-area-inset-top)) var(--space-5) calc(var(--space-12) + env(safe-area-inset-bottom));
 }
 
 /* ---------- MinimalHeader ---------- */
-header.top{display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-8);}
+header.top{display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-5); animation:riseIn .5s var(--ease-out) both;}
 header.top .eyebrow{
   font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--color-text-muted);
   font-weight:600; margin:0; font-family:var(--font-mono);
@@ -91,18 +91,17 @@ header.top h1{
   font-family:var(--font-sans); font-size:20px; margin:2px 0 0; font-weight:520; letter-spacing:-.01em; color:var(--color-text);
 }
 
-/* ---------- StatsOverview (упрощено: только серия и «помню») ---------- */
-.stats-hero{margin-bottom:var(--space-10);}
-.stats-simple-row{display:flex; gap:var(--space-10);}
-.stat-simple{display:flex; flex-direction:column; gap:2px;}
-.stat-simple-num{
-  font-size:clamp(40px,11vw,56px); font-weight:450; line-height:.95; letter-spacing:-.03em;
-  font-variant-numeric:tabular-nums; color:var(--color-text);
-}
-.stat-simple-label{
-  font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; color:var(--color-text-muted);
-  text-transform:uppercase; font-weight:500;
-}
+/* ---------- StatsOverview ---------- */
+.stats-hero{margin-bottom:var(--space-8); animation:riseIn .55s .08s var(--ease-out) both;}
+.stats-top-row{display:flex; align-items:flex-end; justify-content:space-between; gap:var(--space-4);}
+.stats-overview{display:flex; align-items:flex-end; gap:var(--space-5);}
+.stat-main{display:flex; flex-direction:column; gap:5px;}
+.stat-main-num{font-size:clamp(48px,15vw,76px); font-weight:430; line-height:.86; letter-spacing:-.055em; font-variant-numeric:tabular-nums;}
+.stat-main-label{font-family:var(--font-mono); font-size:11px; letter-spacing:.035em; color:var(--color-text-muted); text-transform:uppercase; font-weight:480; line-height:1.35; max-width:128px;}
+.stat-main-label strong{font-weight:600; color:var(--color-text);}
+.stat-streak{display:flex; flex-direction:column; gap:3px; padding-bottom:2px;}
+.stat-streak-num{font-size:clamp(26px,8vw,38px); font-weight:450; line-height:.95; letter-spacing:-.04em; font-variant-numeric:tabular-nums;}
+.stat-streak-label{font-family:var(--font-mono); font-size:10px; letter-spacing:.045em; color:var(--color-text-muted); text-transform:uppercase; white-space:nowrap;}
 
 /* ---------- section titles ---------- */
 .section-title{
@@ -120,50 +119,59 @@ header.top h1{
 .data-note{font-size:12px; line-height:1.4; color:var(--color-text-muted); margin:var(--space-3) 0 0;}
 
 /* ---------- TopicMap / TopicBlob ---------- */
-.topic-map{display:flex; flex-direction:column; gap:var(--space-5);}
+.topic-map{display:flex; flex-direction:column; gap:var(--space-2); animation:riseIn .55s .2s var(--ease-out) both;}
 .topic-blob{
   position:relative; isolation:isolate; border:none; background:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
   width:100%;
-  min-height:44px; padding:var(--space-4) var(--space-5); text-align:left;
-  transition:opacity .25s var(--ease-out), transform .18s var(--ease-out);
-  opacity:.42;
+  min-height:52px; padding:var(--space-3) var(--space-5); text-align:left;
+  transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
+  opacity:calc(.35 + var(--topic-progress, 0) * .55);
+  filter:saturate(calc(.72 + var(--topic-progress, 0) * .75));
+  animation:topicIn .55s var(--topic-delay, 0s) var(--ease-out) both;
 }
 .topic-blob::before{
   content:''; position:absolute; z-index:-1; pointer-events:none;
   left:0; top:50%; transform:translateY(-50%);
   width:var(--blob-size); height:calc(var(--blob-size) * .74);
-  border-radius:45% 55% 60% 40% / 55% 45% 55% 45%;
-  background:radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 38%, transparent 72%);
-  filter:blur(16px);
-  opacity:.85;
+  border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
+  background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
+  filter:blur(12px);
+  opacity:calc(.42 + var(--topic-progress, 0) * .5);
+  transition:transform .25s var(--ease-out), filter .25s ease, opacity .25s ease;
+  animation:cloudDrift var(--topic-drift, 8s) ease-in-out var(--topic-delay, 0s) infinite alternate;
 }
-.topic-blob.on{opacity:1;}
-.topic-blob:hover{transform:translateY(-1px);}
-.topic-blob:hover::before{transform:translateY(-50%) scale(1.03); filter:blur(15px);}
-.topic-blob:active{transform:scale(.985);}
+.topic-blob.on{opacity:calc(.46 + var(--topic-progress, 0) * .54);}
+.topic-blob:not(.on){opacity:.18; filter:saturate(.55);}
+.topic-blob:hover,.topic-blob:focus-visible{transform:translate(2px,-2px);}
+.topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translateY(-50%) scale(1.045); filter:blur(10px); opacity:1;}
+.topic-blob:active{transform:translate(2px,-1px) scale(.985);}
 .topic-blob:nth-child(3n+2){align-self:stretch; align-items:flex-end; text-align:right;}
 .topic-blob:nth-child(3n+2)::before{left:auto; right:0;}
 .topic-blob:nth-child(4n+3){margin-top:-4px;}
 .topic-blob:nth-child(5n+1){margin-top:6px;}
 .topic-name{
-  font-family:var(--font-mono); font-size:13.5px; font-weight:550; letter-spacing:.05em; text-transform:uppercase;
+  font-family:var(--font-mono); font-size:13px; font-weight:480; letter-spacing:.038em; text-transform:uppercase;
   color:var(--color-text); line-height:1.3;
 }
-.topic-meta{font-size:12px; color:var(--color-text-muted); margin-top:3px; font-weight:500; font-variant-numeric:tabular-nums;}
+.topic-meta{font-size:11.5px; color:var(--color-text-muted); margin-top:1px; font-weight:500; font-variant-numeric:tabular-nums;}
 
-/* ---------- top action: start button next to the headline number ---------- */
-.stats-top-row{display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-4);}
-.start-col{display:flex; flex-direction:column; align-items:flex-end; gap:var(--space-2); flex:none; padding-top:var(--space-2);}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes topicIn{from{opacity:0;transform:translateY(8px);}to{opacity:var(--topic-final-opacity,1);transform:translateY(0);}}
+@keyframes cloudDrift{from{margin-top:-1px;}to{margin-top:2px;}}
+
+/* ---------- top action ---------- */
+.start-col{display:flex; flex-direction:column; align-items:center; gap:var(--space-1); flex:none; padding-bottom:1px;}
 .btn-primary{
-  background:var(--color-text); color:var(--color-bg); border:none;
-  padding:14px 26px; border-radius:var(--radius-pill); font-size:14.5px; font-weight:600; cursor:pointer;
-  transition:transform .15s var(--ease-out), opacity .15s ease; white-space:nowrap;
+  width:48px; height:48px; display:grid; place-items:center; background:transparent; color:var(--color-text);
+  border:1px solid rgba(24,24,23,.36); border-radius:50%; padding:0; font-size:23px; line-height:1; cursor:pointer;
+  transition:transform .2s var(--ease-out), background .2s ease, color .2s ease; white-space:nowrap;
 }
-.btn-primary:hover{transform:translateY(-1px);}
-.btn-primary:active{transform:translateY(0) scale(.98);}
+.btn-primary:hover,.btn-primary:focus-visible{transform:translateY(-2px); background:var(--color-text); color:var(--color-bg);}
+.btn-primary:active{transform:translateY(0) scale(.94);}
 .btn-primary:disabled{opacity:.35; cursor:not-allowed; transform:none;}
-.hint-empty{font-size:11.5px; color:var(--color-text-muted); font-weight:500; text-align:right; max-width:120px;}
+.start-label{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:var(--color-text-muted); text-transform:uppercase;}
+.hint-empty{font-size:10px; color:var(--color-text-muted); font-weight:500; text-align:center; max-width:100px;}
 
 /* ---------- SESSION ---------- */
 #session{display:none; flex-direction:column; gap:var(--space-8);}
@@ -190,6 +198,7 @@ header.top h1{
 @keyframes calmshake{0%,100%{transform:translateX(0);}33%{transform:translateX(-4px);}66%{transform:translateX(4px);}}
 @media (prefers-reduced-motion: reduce){
   .stage.correct,.stage.wrong{animation:none;}
+  .topic-blob,.topic-blob::before,header.top,.stats-hero,.topic-map{animation:none !important;}
   *{transition-duration:.01ms !important; animation-duration:.01ms !important;}
 }
 
@@ -296,19 +305,25 @@ header.top h1{
 #toast.show{transform:translateX(-50%) translateY(0);}
 
 /* ---------- showcase: collection + achievements ---------- */
-.showcase-scroll{display:flex; gap:var(--space-3); overflow-x:auto; padding-bottom:4px; margin:0 calc(var(--space-5) * -1); padding-left:var(--space-5); padding-right:var(--space-5); scrollbar-width:none;}
+.showcase-scroll{display:flex; gap:var(--space-5); overflow-x:auto; padding:var(--space-4) 0 var(--space-2); margin:0 calc(var(--space-5) * -1); padding-left:var(--space-5); padding-right:var(--space-5); scrollbar-width:none; animation:riseIn .55s .28s var(--ease-out) both;}
 .showcase-scroll::-webkit-scrollbar{display:none;}
 .showcase-item{
-  display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; flex:none;
-  width:112px; background:var(--color-surface); border-radius:var(--radius-md); padding:var(--space-4) var(--space-2);
-  transition:opacity .2s ease;
+  display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; flex:none;
+  width:102px; min-height:122px; background:transparent; border-radius:0; padding:var(--space-2) 0;
+  transition:opacity .25s ease, transform .25s var(--ease-out), filter .25s ease;
 }
-.showcase-item.locked{opacity:.35; filter:grayscale(.6);}
-.showcase-icon{width:34px;height:34px;}
+.showcase-item.locked{opacity:.42; filter:grayscale(.65); transform:scale(.9);}
+.showcase-item.unlocked{opacity:1; transform:scale(1.05);}
+.showcase-item.just-unlocked{animation:bloomIn .75s var(--ease-out) both;}
+.showcase-icon{width:54px;height:62px; transition:transform .5s var(--ease-out), filter .5s ease;}
+.showcase-item.locked .showcase-icon{width:42px;height:50px;}
 .showcase-icon svg{width:100%;height:100%;display:block;}
-.showcase-name{font-size:11.5px; font-weight:550; color:var(--color-text); line-height:1.3;}
+.showcase-name{font-size:11px; font-weight:520; color:var(--color-text); line-height:1.3; max-width:94px;}
 .showcase-item.locked .showcase-name{color:var(--color-text-muted);}
-.showcase-req{font-size:10.5px; color:var(--color-text-muted); font-weight:500; font-variant-numeric:tabular-nums; font-family:var(--font-mono);}
+.showcase-req{font-size:10px; color:var(--color-text-muted); font-weight:500; font-variant-numeric:tabular-nums; font-family:var(--font-mono);}
+.garden-next{display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-2); color:var(--color-text-muted); font-size:12px;}
+.garden-next-stem{width:46px; height:2px; background:linear-gradient(90deg,var(--color-green) var(--next-progress,0%), var(--color-line) var(--next-progress,0%)); border-radius:999px;}
+@keyframes bloomIn{0%{opacity:.35;transform:scale(.78);}55%{opacity:1;transform:scale(1.13);}100%{opacity:1;transform:scale(1.05);}}
 
 @media (max-width:380px){
   .stat-simple-num{font-size:clamp(34px,13vw,44px);}
@@ -333,7 +348,8 @@ header.top h1{
       <div class="stats-top-row">
         <div id="statsHeroNumber"></div>
         <div class="start-col">
-          <button class="btn-primary" id="startBtn">Начать</button>
+          <button class="btn-primary" id="startBtn" aria-label="Начать тренировку" title="Начать тренировку">→</button>
+          <span class="start-label">Начать</span>
           <span class="hint-empty" id="poolHint"></span>
         </div>
       </div>
@@ -341,14 +357,14 @@ header.top h1{
 
     <div class="section-block">
       <p class="section-title">Темы</p>
-      <p class="section-sub">Выбери, что повторить</p>
       <div class="topic-map" id="topics"></div>
     </div>
 
     <div class="section-block">
       <p class="section-title">Сад достижений</p>
-      <p class="section-sub">Открывай новые цветы — какой именно, узнаешь только когда он распустится</p>
+      <p class="section-sub">Открывай цветы, занимаясь каждый день</p>
       <div class="showcase-scroll" id="gardenGrid"></div>
+      <div class="garden-next" id="gardenNext"></div>
     </div>
 
     <div class="section-block">
@@ -553,22 +569,18 @@ function masteredCount(ids){
   ids = ids || VOCAB.map(w=>w.id);
   return ids.filter(id=>boxOf(id)>=3).length;
 }
-/* Упрощено по просьбе: в шапке остаются только две вещи — серия дней и
-   количество выученных слов. Уровень, щиты, «сегодня пройдено» и общее число
-   слов по-прежнему считаются (это бизнес-логика), просто больше не выводятся
-   в шапку, чтобы не перегружать первый экран. */
 function renderStats(){
   const mastered = masteredCount();
   const streak = STATE.dayStreak||0;
   document.getElementById('statsHeroNumber').innerHTML = `
-    <div class="stats-simple-row">
-      <div class="stat-simple">
-        <span class="stat-simple-num">${streak}</span>
-        <span class="stat-simple-label">${streak>0? pluralDays(streak)+' подряд' : 'дней подряд'}</span>
+    <div class="stats-overview">
+      <div class="stat-main">
+        <span class="stat-main-num">${mastered}</span>
+        <span class="stat-main-label"><strong>из ${VOCAB.length}</strong> слов помню</span>
       </div>
-      <div class="stat-simple">
-        <span class="stat-simple-num">${mastered}</span>
-        <span class="stat-simple-label">слов помню</span>
+      <div class="stat-streak">
+        <span class="stat-streak-num">${streak}</span>
+        <span class="stat-streak-label">${streak>0? pluralDays(streak)+' подряд' : 'дней подряд'}</span>
       </div>
     </div>
   `;
@@ -594,14 +606,31 @@ function renderTopics(){
   const el = document.getElementById('topics');
   const visible = TOPIC_GROUPS.filter(g=>GROUP_COUNTS[g.key]);
   const maxCount = Math.max(...visible.map(g=>GROUP_COUNTS[g.key]));
+  const blobRadii = [
+    '46% 54% 61% 39% / 54% 42% 58% 46%',
+    '58% 42% 47% 53% / 39% 61% 43% 57%',
+    '38% 62% 54% 46% / 64% 36% 58% 42%',
+    '67% 33% 51% 49% / 45% 55% 40% 60%',
+    '49% 51% 34% 66% / 58% 42% 65% 35%'
+  ];
+  const blobBackgrounds = [
+    'radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 40%, transparent 74%)',
+    'radial-gradient(ellipse at 62% 44%, var(--blob-color) 0%, var(--blob-color) 38%, transparent 73%)',
+    'radial-gradient(ellipse at 42% 34%, var(--blob-color) 0%, var(--blob-color) 36%, transparent 70%), radial-gradient(circle at 72% 64%, var(--blob-color) 0%, transparent 62%)',
+    'radial-gradient(ellipse at 48% 38%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 76%)',
+    'radial-gradient(circle at 34% 48%, var(--blob-color) 0%, var(--blob-color) 35%, transparent 69%), radial-gradient(ellipse at 72% 42%, var(--blob-color) 0%, transparent 64%)'
+  ];
   el.innerHTML = visible.map(g=>{
+    const index = visible.indexOf(g);
     const on = selectedTopics.has(g.key);
     const count = GROUP_COUNTS[g.key];
     const ids = VOCAB.filter(w=>w.group===g.key).map(w=>w.id);
     const learned = masteredCount(ids);
+    const progress = count ? learned/count : 0;
     const size = blobSizeFor(count, maxCount);
     const color = blobColorFor(g.key);
-    return `<button class="topic-blob ${on?'on':''}" data-key="${g.key}" style="--blob-size:${size}px; --blob-color:${color}">
+    const finalOpacity = on ? .46 + progress*.54 : .18;
+    return `<button class="topic-blob ${on?'on':''}" data-key="${g.key}" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${(index*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
       <span class="topic-name">${g.label}</span>
       <span class="topic-meta">${learned} из ${count}</span>
     </button>`;
@@ -670,30 +699,52 @@ function unlockFlag(id){
   STATE.achievements[id] = todayStr();
   saveState();
 }
-function renderGarden(){
+function gardenProgress(f){
+  if(/^m\d+$/.test(f.id)){
+    const target = Number(f.id.slice(1));
+    return {current:Math.min(masteredCount(), target), target, label:`${Math.min(masteredCount(), target)} из ${target} слов`};
+  }
+  if(f.id.startsWith('streak')){
+    const target = Number(f.id.slice(6));
+    return {current:Math.min(STATE.dayStreak||0, target), target, label:`${Math.min(STATE.dayStreak||0, target)} из ${target} дней`};
+  }
+  if(f.id==='sprout') return {current:Math.min(STATE.totalCorrectEver||0,1), target:1, label:`${Math.min(STATE.totalCorrectEver||0,1)} из 1 ответа`};
+  const unlocked = STATE.announcedCollectibles.includes(f.id);
+  return {current:unlocked?1:0, target:1, label:unlocked?'открыто':'ещё впереди'};
+}
+function renderGarden(justUnlocked=[]){
   document.getElementById('gardenGrid').innerHTML = GARDEN.map(f=>{
     const unlocked = STATE.announcedCollectibles.includes(f.id);
+    const progress = gardenProgress(f);
     const icon = unlocked
       ? buildFlowerSVG(f.petals, f.color, false)
       : buildFlowerSVG(0, 'var(--color-line)', true);
-    return `<div class="showcase-item ${unlocked?'unlocked':'locked'}" title="${f.desc}">
+    return `<div class="showcase-item ${unlocked?'unlocked':'locked'} ${justUnlocked.includes(f.id)?'just-unlocked':''}" title="${f.desc}">
       <div class="showcase-icon">${icon}</div>
-      <span class="showcase-name">${unlocked? f.name : '?'}</span>
-      <span class="showcase-req">${f.costLabel}</span>
+      <span class="showcase-name">${f.name}</span>
+      <span class="showcase-req">${unlocked?'открыто':progress.label}</span>
     </div>`;
   }).join('');
+  const next = GARDEN.find(f=>!STATE.announcedCollectibles.includes(f.id));
+  const nextEl = document.getElementById('gardenNext');
+  if(!next){ nextEl.innerHTML = '<span class="garden-next-stem" style="--next-progress:100%"></span><span>Сад полностью распустился</span>'; return; }
+  const nextProgress = gardenProgress(next);
+  const pct = Math.round(nextProgress.current/nextProgress.target*100);
+  nextEl.innerHTML = `<span class="garden-next-stem" style="--next-progress:${pct}%"></span><span>До следующего цветка: ${nextProgress.target-nextProgress.current} ${nextProgress.target-nextProgress.current===1?'шаг':'шагов'}</span>`;
 }
 function checkGarden(){
   let unlockedNew = false;
+  const justUnlocked = [];
   GARDEN.forEach(f=>{
     if(!STATE.announcedCollectibles.includes(f.id) && f.cost()){
       STATE.announcedCollectibles.push(f.id);
+      justUnlocked.push(f.id);
       saveState();
       queueToast(`Сад: распустился цветок «${f.name}»`, 'achv');
       unlockedNew = true;
     }
   });
-  if(unlockedNew) renderGarden();
+  if(unlockedNew) renderGarden(justUnlocked);
 }
 
 renderTopics(); renderPoolHint(); renderStats(); renderGarden();
