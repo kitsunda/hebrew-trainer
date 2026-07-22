@@ -528,6 +528,17 @@ function groupOf(topic, word){
   const r = (word?.r||'').toLowerCase();
   const all = `${t} ${h} ${r}`;
   const tokens = hebrewTokens(h);
+  const oneHebrewWord = tokens.length===1 && h.replace(/[\s־–—-]/g,'').length<18;
+  const hebrewInfinitive = oneHebrewWord && /^ל[א-ת]{2,}$/.test(tokens[0]);
+  const russianInfinitive = /(?:^|[—–,:;\s-])(\S+(?:ть|ться))(?:$|[\s,;.])/.test(r);
+  const explicitlyVerb = /глагол|инфинитив|биньян/.test(t);
+  const lenyaSource = /^л[её]ня:/.test(t);
+
+  // Метка из исходного словаря надёжнее тематических совпадений: «работать»
+  // остаётся глаголом, а не уезжает в «Работу». Для слов без метки требуем
+  // одновременно и ивритский, и русский признак инфинитива, чтобы «память»
+  // или «власть» не становились глаголами только из-за окончания «-ть».
+  if(explicitlyVerb || (!lenyaSource && hebrewInfinitive && russianInfinitive)) return 'verbs';
   if(/песня|молитва|строк[аи] песни|текст песни|^песня|שיר|מילים לשיר/.test(all)) return 'songs';
   if(/идиом|сленг|устойчив|переносн|ביטוי|סלנג|дословно|в контексте|что ты ко мне привязался/.test(all)) return 'idioms';
   if(/здоров|тел[оа]|врач|лекар|боль|привив|болез|симптом|ухо|уши|рецепт|רופא|בריאות|חיסון|כאב|אוזן|אוזניים|מרשם/.test(all)) return 'health';
@@ -536,10 +547,9 @@ function groupOf(topic, word){
   if(/переезд|переезж|дорог|машин|автобус|поезд|самол|такси|улиц|город|пляж|путешеств|гулять|вернут|возвращ|приех|приход|направлен|снаружи|заграниц|נסיעה|אוטובוס|רכבת|מכונית|עיר|חוף|לחזור|להחזיר|לעבור דירה|חוץ לארץ/.test(all)) return 'transport';
   if(/грамматик|предлог|местоим|суффикс|связк|пассив|степен|спряжен|конструкц|модаль|союз|потому что|так как|кроме|слишком|чем\.\.|עברית דקדוק|מפני ש|חוץ מ|מאשר/.test(all)) return 'grammar';
   if(looksLikeReadyPhrase(word) || /^фразы$/.test(t)) return 'phrases';
-  const oneHebrewWord = tokens.length===1 && h.replace(/[\s־–—-]/g,'').length<18;
-  const infinitive = oneHebrewWord && /^ל[א-ת]{2,}$/.test(tokens[0]);
-  const russianVerb = /(?:^|[—–,:;\s-])(\S+(?:ть|ться))(?:$|[\s,;.])/.test(r);
-  if(/глагол|инфинитив|биньян/.test(t) || infinitive || russianVerb) return 'verbs';
+  // У Лёни пока нет исходных меток частей речи, поэтому сохраняем его
+  // прежнее распределение до отдельной ручной чистки словаря.
+  if(lenyaSource && (hebrewInfinitive || russianInfinitive)) return 'verbs';
   return 'everyday';
 }
 
