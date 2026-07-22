@@ -629,6 +629,56 @@ const VERB_FORM_SPECS = [
   {key:'present', label:'Я · НАСТОЯЩЕЕ · М.Р.'},
 ];
 const VERB_FAMILIES = Array.isArray(window.VERB_FAMILIES) ? window.VERB_FAMILIES : [];
+const IRREGULAR_PRESENT_1S = {
+  'быть':'есть','есть':'ем','идти':'иду','ехать':'еду','пить':'пью','спать':'сплю',
+  'жить':'живу','хотеть':'хочу','мочь':'могу','уметь':'умею','дать':'даю','взять':'беру',
+  'сесть':'сажусь','лечь':'ложусь','стоять':'стою','летать':'летаю','сказать':'говорю',
+  'писать':'пишу','читать':'читаю','любить':'люблю','купить':'покупаю','продать':'продаю',
+  'открыть':'открываю','закрыть':'закрываю','помочь':'помогаю','звонить':'звоню',
+  'приходить':'прихожу','возвращаться':'возвращаюсь','учиться':'учусь','слышать':'слышу',
+  'приносить':'приношу','вставать':'встаю','платить':'плачу','видеть':'вижу','ждать':'жду',
+  'помнить':'помню','брать':'беру','выходить':'выхожу','оставаться':'остаюсь','петь':'пою',
+  'искать':'ищу','готовить':'готовлю','варить':'варю','жарить':'жарю','делить':'делю',
+  'смеяться':'смеюсь','расти':'расту','падать':'падаю','плавать':'плаваю','танцевать':'танцую',
+  'смотреть':'смотрю','играть':'играю','приобретать':'приобретаю','начинать':'начинаю',
+  'сравнивать':'сравниваю','использовать':'использую','заказывать':'заказываю','приглашать':'приглашаю',
+  'успевать':'успеваю','рекомендовать':'рекомендую','предлагать':'предлагаю','защищать':'защищаю',
+  'возвращать':'возвращаю','напоминать':'напоминаю','поднимать':'поднимаю','останавливать':'останавливаю',
+  'объяснять':'объясняю','соглашаться':'соглашаюсь','ценить':'ценю','скрывать':'скрываю',
+  'помогать':'помогаю','отдыхать':'отдыхаю',
+};
+const IRREGULAR_PAST_3S = {
+  'быть':'был','есть':'ел','идти':'шёл','ехать':'ехал','пить':'пил','спать':'спал',
+  'жить':'жил','хотеть':'хотел','мочь':'мог','уметь':'умел','дать':'дал','взять':'взял',
+  'сесть':'сел','лечь':'лёг','сказать':'сказал','прийти':'пришёл','уйти':'ушёл',
+  'найти':'нашёл','увидеть':'увидел','купить':'купил','продать':'продал',
+  'умереть':'умер','расти':'рос','прийти':'пришёл','вернуться':'вернулся',
+};
+function verbSense(meaning, tense){
+  const clean = String(meaning||'').replace(/\([^)]*\)/g,'').trim();
+  const parts = clean.split(/\s*(?:\/|;|,|—)\s*/).map(x=>x.trim()).filter(Boolean);
+  return (tense==='past' ? parts[parts.length-1] : parts[0]) || clean;
+}
+function russianPresent1s(infinitive){
+  const v = infinitive.toLowerCase().trim();
+  if(IRREGULAR_PRESENT_1S[v]) return IRREGULAR_PRESENT_1S[v];
+  if(!/ть$/.test(v)) return v;
+  const stem = v.slice(0,-2);
+  if(stem.endsWith('и')) return stem.slice(0,-1)+'ю';
+  return stem+'ю';
+}
+function russianPast3s(infinitive){
+  const v = infinitive.toLowerCase().trim();
+  if(IRREGULAR_PAST_3S[v]) return IRREGULAR_PAST_3S[v];
+  if(!/ть$/.test(v)) return v;
+  const stem = v.slice(0,-2);
+  return stem+'л';
+}
+function verbFormTranslation(family, form){
+  if(form.key==='infinitive') return verbSense(family.meaning,'infinitive');
+  if(form.key==='past') return russianPast3s(verbSense(family.meaning,'past'));
+  return russianPresent1s(verbSense(family.meaning,'infinitive'));
+}
 const VERB_CARDS = [];
 VERB_FAMILIES.forEach(family=>{
   VERB_FORM_SPECS.forEach(form=>{
@@ -638,7 +688,7 @@ VERB_FAMILIES.forEach(family=>{
       id:`verb:${family.id}:${form.key}`,
       h:hebrew,
       t:'',
-      r:family.meaning,
+      r:verbFormTranslation(family, form),
       g:'глаголы',
       k:'word',
       group:'verbs',
