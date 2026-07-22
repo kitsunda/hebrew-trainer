@@ -388,16 +388,6 @@ header.top h1{
       <div class="garden-next" id="gardenNext"></div>
     </div>
 
-    <div class="section-block">
-      <p class="section-title">Прогресс</p>
-      <p class="section-sub">Сохрани резервную копию или перенеси занятия в другой браузер</p>
-      <div class="data-actions">
-        <button class="data-action" id="exportProgress" type="button">Скачать прогресс</button>
-        <button class="data-action" id="importProgress" type="button">Загрузить прогресс</button>
-        <input id="progressFile" type="file" accept="application/json,.json" hidden>
-      </div>
-      <p class="data-note">При загрузке текущий прогресс в этом браузере будет заменён.</p>
-    </div>
   </section>
 
   <section id="session">
@@ -1149,13 +1139,6 @@ document.getElementById('profileSwitch').addEventListener('click', ()=>{
   applyProfileUI();
 });
 applyProfileUI();
-document.getElementById('exportProgress').addEventListener('click', exportProgress);
-document.getElementById('importProgress').addEventListener('click', ()=>document.getElementById('progressFile').click());
-document.getElementById('progressFile').addEventListener('change', event=>{
-  const file = event.target.files[0];
-  if(file) importProgress(file);
-  event.target.value = '';
-});
 </script>
 </body>
 </html>
