@@ -764,12 +764,12 @@ function renderGarden(justUnlocked=[]){
   }).join('');
   const next = GARDEN.find(f=>!STATE.announcedCollectibles.includes(f.id));
   const nextEl = document.getElementById('gardenNext');
-  if(!next){ nextEl.innerHTML = '<span class="garden-next-stem" style="--next-progress:100%"></span><span>Сад полностью распустился</span>'; return; }
+  if(!next){ nextEl.innerHTML = '<span>Сад полностью распустился</span>'; return; }
   const nextProgress = gardenProgress(next);
   const pct = Math.round(nextProgress.current/nextProgress.target*100);
   const remaining = nextProgress.target-nextProgress.current;
   const action = next.desc.charAt(0).toLowerCase() + next.desc.slice(1);
-  nextEl.innerHTML = `<span class="garden-next-stem" style="--next-progress:${pct}%"></span><span>Чтобы расцвёл следующий цветок, ${action}. Осталось: ${remaining} ${remaining===1?'шаг':'шагов'}</span>`;
+  nextEl.innerHTML = `<span>Чтобы расцвёл следующий цветок, ${action}</span>`;
 }
 function checkGarden(){
   let unlockedNew = false;
