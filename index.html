@@ -771,7 +771,9 @@ function renderGarden(justUnlocked=[]){
   if(!next){ nextEl.innerHTML = '<span class="garden-next-stem" style="--next-progress:100%"></span><span>Сад полностью распустился</span>'; return; }
   const nextProgress = gardenProgress(next);
   const pct = Math.round(nextProgress.current/nextProgress.target*100);
-  nextEl.innerHTML = `<span class="garden-next-stem" style="--next-progress:${pct}%"></span><span>До следующего цветка: ${nextProgress.target-nextProgress.current} ${nextProgress.target-nextProgress.current===1?'шаг':'шагов'}</span>`;
+  const remaining = nextProgress.target-nextProgress.current;
+  const action = next.desc.charAt(0).toLowerCase() + next.desc.slice(1);
+  nextEl.innerHTML = `<span class="garden-next-stem" style="--next-progress:${pct}%"></span><span>Чтобы расцвёл следующий цветок, ${action}. Осталось: ${remaining} ${remaining===1?'шаг':'шагов'}</span>`;
 }
 function checkGarden(){
   let unlockedNew = false;
