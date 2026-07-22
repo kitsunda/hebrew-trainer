@@ -473,12 +473,15 @@ body.session-active .stage{min-height:0;overflow:visible;}
 <script src="vocab.js"></script>
 <script src="lenya-vocab.js"></script>
 <script src="verb-families.js"></script>
+<script src="doc-imports.js"></script>
 <script>
   if (localStorage.getItem('hebrewTrainer_activeProfile') === 'lenya') {
     window.VOCAB = window.LENYA_VOCAB;
     window.VERB_FAMILIES = window.LENYA_VERB_FAMILIES;
+    window.VOCAB.push(...(window.LENYA_DOC_IMPORTS || []));
   } else {
     window.VERB_FAMILIES = window.NASTYA_VERB_FAMILIES;
+    window.VOCAB.push(...(window.NASTYA_DOC_IMPORTS || []));
   }
 </script>
 <script>
