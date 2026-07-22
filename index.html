@@ -151,7 +151,7 @@ header.top h1{
 }
 .topic-blob::before{
   content:''; position:absolute; z-index:-1; pointer-events:none;
-  left:-20px; top:50%; transform:translateY(-50%);
+  left:0; top:50%; transform:translateY(-50%);
   width:calc(var(--blob-size) + 40px); height:calc(var(--blob-size) * .72);
   border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
   background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
@@ -167,7 +167,7 @@ header.top h1{
 .topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translateY(-50%) scale(1.045); filter:blur(10px); opacity:1;}
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
 .topic-blob:nth-child(3n+2){align-self:stretch; align-items:flex-end; text-align:right;}
-.topic-blob:nth-child(3n+2)::before{left:auto; right:-20px;}
+.topic-blob:nth-child(3n+2)::before{left:auto; right:0;}
 .topic-blob:nth-child(4n+3){margin-top:0;}
 .topic-blob:nth-child(5n+1){margin-top:3px;}
 .topic-blob.launching{transform:scale(1.025);pointer-events:none;}
