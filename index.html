@@ -267,6 +267,8 @@ body.session-active .stage{min-height:0;overflow:visible;}
 .flip-zone.revealed .card-back{opacity:1;max-height:340px;transform:translateY(0);}
 .hebrew-word{font-weight:520;text-align:center;line-height:1.25;white-space:normal;word-break:break-word;max-width:100%;max-height:180px;opacity:1;overflow:hidden;transition:opacity .18s var(--ease-out),transform .18s var(--ease-out),max-height .22s var(--ease-out);}
 .flip-zone.revealed .hebrew-word{opacity:1;max-height:180px;transform:translateY(0);}
+.reverse-front{font-family:var(--font-sans);padding:0 16px;box-sizing:border-box;}
+.back-hebrew{font-weight:520;text-align:center;line-height:1.25;max-width:100%;padding:var(--space-2) 12px 0;box-sizing:border-box;overflow-wrap:anywhere;}
 .translit{font-size:14px; color:var(--color-text-muted); font-weight:500; margin-top:var(--space-2);}
 .russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; width:100%; max-width:100%; box-sizing:border-box; margin-top:var(--space-4); padding:var(--space-3) 8px 0;}
 .flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:10px;}
@@ -536,6 +538,13 @@ function russianFontSize(text){
   if(len<=28) return '19px';
   if(len<=50) return '16.5px';
   return '14.5px';
+}
+function russianPromptFontSize(text){
+  const len = (text||'').length;
+  if(len<=14) return 'clamp(28px,6vw,38px)';
+  if(len<=28) return 'clamp(24px,5vw,32px)';
+  if(len<=50) return 'clamp(20px,4.2vw,27px)';
+  return 'clamp(17px,3.5vw,22px)';
 }
 function hebrewTokens(value){
   return (value||'').match(/[א-ת]+/g) || [];
@@ -965,6 +974,11 @@ function masteredCount(ids){
   });
   return ordinary + learnedFamilies;
 }
+function isLearnedForReverse(w){
+  if(!w.verbFamilyId) return boxOf(w.id)>=1;
+  const formIds = VERB_CARD_IDS_BY_FAMILY.get(w.verbFamilyId)||[];
+  return formIds.length>0 && formIds.every(id=>boxOf(id)>=1);
+}
 function renderStats(){
   const mastered = masteredCount();
   const streak = STATE.dayStreak||0;
@@ -1356,16 +1370,21 @@ function attachMnemonicSave(w){
   });
 }
 function renderFlash(stage, w, groupLabel){
+  const reverse = isLearnedForReverse(w);
+  const frontHtml = reverse
+    ? `<div class="hebrew-word reverse-front" style="font-size:${russianPromptFontSize(w.r)}">${w.r}</div>`
+    : `<div class="hebrew-word font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>`;
   stage.classList.add('flash-stage');
   stage.style.setProperty('--stage-color', blobColorFor(w.group));
   stage.innerHTML = `
-    <div class="flip-zone" id="flipZone" role="button" tabindex="0" aria-label="Перевернуть карточку" aria-expanded="false">
+    <div class="flip-zone${reverse?' reverse-card':''}" id="flipZone" role="button" tabindex="0" aria-label="Перевернуть карточку" aria-expanded="false">
       <div class="flash-focus">
         <div class="flash-word-stack">
-          <div class="hebrew-word font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>
+          ${frontHtml}
           <div class="card-back" id="cardBack" aria-hidden="true">
+            ${reverse? `<div class="back-hebrew font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>` : ''}
             ${w.t? `<div class="translit">${w.t}</div>` : ''}
-            <div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>
+            ${reverse ? '' : `<div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>`}
             ${contextLineHtml(w)}
             ${mnemonicHintHtml(w)}
           </div>
