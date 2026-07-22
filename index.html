@@ -231,14 +231,19 @@ header.top h1{
 }
 
 /* flashcard: fade reveal, no 3D flip */
-.flip-zone{width:100%; max-width:420px; cursor:pointer; min-height:144px; display:flex; flex-direction:column; align-items:center;}
-.card-back{opacity:0; transform:translateY(8px); transition:opacity .22s var(--ease-out), transform .22s var(--ease-out); width:100%;}
-.flip-zone.revealed .card-back{opacity:1; transform:translateY(0);}
+.flip-zone{width:100%; max-width:420px; cursor:pointer; min-height:370px; display:flex; flex-direction:column; align-items:center;}
+.stage.flash-stage::before{display:none;}
+.flash-focus{position:relative;isolation:isolate;width:100%;min-height:330px;display:grid;place-items:center;}
+.flash-focus::before{content:'';position:absolute;z-index:-1;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,370px);height:290px;border-radius:48% 52% 58% 42% / 55% 45% 58% 42%;background:radial-gradient(circle at 45% 44%,var(--stage-color,var(--color-mint)) 0 30%,color-mix(in srgb,var(--stage-color,var(--color-mint)) 80%,transparent) 46%,transparent 72%);filter:blur(24px);opacity:.86;}
+.flash-focus .topic-tag{position:absolute;top:48px;left:0;right:0;margin:0;text-align:center;}
+.flash-word-stack{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.card-back{opacity:0;max-height:0;overflow:hidden;transform:translateY(8px);transition:opacity .22s var(--ease-out),transform .22s var(--ease-out),max-height .28s var(--ease-out);width:100%;}
+.flip-zone.revealed .card-back{opacity:1;max-height:260px;transform:translateY(0);}
 .flip-zone.revealed .card-front-hint{opacity:0; height:0; overflow:hidden;}
 .hebrew-word{font-weight:520; text-align:center; line-height:1.25; white-space:normal; word-break:break-word; max-width:100%;}
 .translit{font-size:14px; color:var(--color-text-muted); font-weight:500; margin-top:var(--space-2);}
 .russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; max-width:100%; margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--color-line);}
-.flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:var(--space-4);}
+.flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:10px;}
 
 .know-row{display:flex; align-items:center; justify-content:center; gap:var(--space-5); margin-top:auto; padding-top:var(--space-10); width:100%;}
 .know-btn{
@@ -365,6 +370,9 @@ header.top h1{
   #session{min-height:calc(100svh - 76px);}
   .stage{min-height:calc(100svh - 126px);padding-top:clamp(92px,16vh,142px);padding-bottom:max(84px,calc(env(safe-area-inset-bottom) + 48px));}
   .stage::before{top:39%;height:270px;}
+  .flash-focus{min-height:320px;}
+  .flash-focus::before{height:270px;}
+  .flash-focus .topic-tag{top:46px;}
   .topic-tag{margin-bottom:22px;}
   .know-row{margin-top:auto;padding-top:clamp(42px,7vh,68px);gap:10px;}
   .know-btn{min-width:0;max-width:160px;}
@@ -976,18 +984,23 @@ function attachMnemonicSave(w){
   });
 }
 function renderFlash(stage, w, groupLabel){
+  stage.classList.add('flash-stage');
   stage.style.setProperty('--stage-color', blobColorFor(w.group));
   stage.innerHTML = `
-    <span class="topic-tag">${groupLabel}</span>
     <div class="flip-zone" id="flipZone">
-      <div class="hebrew-word font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>
-      ${w.t? `<div class="translit">${w.t}</div>` : ''}
-      ${mnemonicHintHtml(w)}
-      <div class="card-back">
-        <div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>
-        ${contextLineHtml(w)}
+      <div class="flash-focus">
+        <span class="topic-tag">${groupLabel}</span>
+        <div class="flash-word-stack">
+          <div class="hebrew-word font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>
+          ${w.t? `<div class="translit">${w.t}</div>` : ''}
+          ${mnemonicHintHtml(w)}
+          <div class="card-back">
+            <div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>
+            ${contextLineHtml(w)}
+          </div>
+        </div>
       </div>
-      <div class="flip-hint card-front-hint">нажми, чтобы посмотреть перевод</div>
+      ${session.i===0 ? '<div class="flip-hint card-front-hint">нажми, чтобы посмотреть перевод</div>' : ''}
     </div>
     <div class="know-row" id="knowRow" style="display:none;">
       <button class="know-btn no" id="btnNo">Ещё учу</button>
