@@ -140,25 +140,19 @@ header.top h1{
 /* ---------- TopicMap / TopicBlob ---------- */
 .topic-map{display:flex; flex-direction:column; gap:14px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
 .topic-blob{
-  position:relative; isolation:isolate; border:none; background:none; cursor:pointer;
+  position:relative; border:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   width:min(calc(var(--blob-size) + 54px),100%);
   height:calc(var(--blob-size) * .72); min-height:80px; padding:var(--space-4) var(--space-5); text-align:center;
+  background:var(--blob-background,radial-gradient(ellipse at 50% 50%,var(--blob-color) 0 24%,color-mix(in srgb,var(--blob-color) 76%,transparent) 43%,transparent 68%));
+  background-repeat:no-repeat; background-size:100% 100%;
   transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
   opacity:1;
   filter:saturate(1.08);
   animation:topicIn .55s var(--topic-delay, 0s) var(--ease-out) both;
 }
 .topic-blob::before{
-  content:''; position:absolute; z-index:-1; pointer-events:none;
-  left:50%; top:50%; transform:translate(-50%,-50%);
-  width:100%; height:100%;
-  border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
-  background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
-  filter:blur(16px);
-  opacity:.94;
-  transition:transform .25s var(--ease-out), filter .25s ease, opacity .25s ease;
-  animation:cloudDrift var(--topic-drift, 8s) ease-in-out var(--topic-delay, 0s) infinite alternate;
+  display:none;
 }
 .topic-blob.on{opacity:1;filter:saturate(1.08);}
 .topic-blob:not(.on){opacity:.46; filter:saturate(.42);}
@@ -977,11 +971,11 @@ function renderTopics(){
     '49% 51% 34% 66% / 58% 42% 65% 35%'
   ];
   const blobBackgrounds = [
-    'radial-gradient(circle at 50% 46%, var(--blob-color) 0 32%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)',
-    'radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 33%, color-mix(in srgb,var(--blob-color) 84%,transparent) 50%, transparent 73%)',
-    'radial-gradient(ellipse at 48% 46%, var(--blob-color) 0 31%, color-mix(in srgb,var(--blob-color) 82%,transparent) 48%, transparent 71%)',
-    'radial-gradient(ellipse at 52% 47%, var(--blob-color) 0 34%, color-mix(in srgb,var(--blob-color) 85%,transparent) 51%, transparent 74%)',
-    'radial-gradient(circle at 50% 50%, var(--blob-color) 0 32%, color-mix(in srgb,var(--blob-color) 82%,transparent) 49%, transparent 72%)'
+    'radial-gradient(ellipse at 50% 46%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 78%,transparent) 43%, transparent 68%)',
+    'radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 25%, color-mix(in srgb,var(--blob-color) 80%,transparent) 44%, transparent 69%)',
+    'radial-gradient(ellipse at 48% 46%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 77%,transparent) 42%, transparent 67%)',
+    'radial-gradient(ellipse at 52% 47%, var(--blob-color) 0 26%, color-mix(in srgb,var(--blob-color) 80%,transparent) 45%, transparent 70%)',
+    'radial-gradient(ellipse at 50% 50%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 78%,transparent) 43%, transparent 68%)'
   ];
   const weeklyIds = LEARNING_VOCAB.filter(w=>w.isWeekly).map(w=>w.id);
   const weeklyCount = weeklyIds.length;
