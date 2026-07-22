@@ -138,11 +138,11 @@ header.top h1{
 .data-note{font-size:12px; line-height:1.4; color:var(--color-text-muted); margin:var(--space-3) 0 0;}
 
 /* ---------- TopicMap / TopicBlob ---------- */
-.topic-map{display:flex; flex-direction:column; gap:7px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8);}
+.topic-map{display:flex; flex-direction:column; gap:14px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
 .topic-blob{
   position:relative; isolation:isolate; border:none; background:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  width:min(calc(var(--blob-size) + 40px),100%);
+  width:min(calc(var(--blob-size) + 54px),100%);
   height:calc(var(--blob-size) * .72); min-height:80px; padding:var(--space-4) var(--space-5); text-align:center;
   transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
   opacity:1;
@@ -155,7 +155,7 @@ header.top h1{
   width:100%; height:100%;
   border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
   background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
-  filter:blur(10px);
+  filter:blur(16px);
   opacity:.94;
   transition:transform .25s var(--ease-out), filter .25s ease, opacity .25s ease;
   animation:cloudDrift var(--topic-drift, 8s) ease-in-out var(--topic-delay, 0s) infinite alternate;
@@ -183,10 +183,10 @@ header.top h1{
 .topic-blob.launching::before{transform:translate(-50%,-50%) scale(1.1);filter:blur(12px);opacity:1;}
 .topic-blob.weekly-topic.launching::before{transform:translate(-50%,-50%) scale(1.1);}
 .topic-name{
-  font-family:var(--font-mono); font-size:13px; font-weight:480; letter-spacing:.038em; text-transform:uppercase;
+  font-family:var(--font-mono); font-size:14px; font-weight:500; letter-spacing:.038em; text-transform:uppercase;
   color:var(--color-text); line-height:1.3;
 }
-.topic-meta{font-size:11.5px; color:var(--color-text-muted); margin-top:1px; font-weight:500; font-variant-numeric:tabular-nums;}
+.topic-meta{font-size:12px; color:var(--color-text-muted); margin-top:2px; font-weight:500; font-variant-numeric:tabular-nums;}
 
 @keyframes riseIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes topicIn{from{opacity:0;transform:translateY(8px);}to{opacity:var(--topic-final-opacity,1);transform:translateY(0);}}
@@ -965,7 +965,7 @@ const TOPIC_COLORS = {
   health:'var(--color-coral)', transport:'var(--color-mint)', idioms:'var(--color-blue)', songs:'var(--color-lilac)'
 };
 function blobColorFor(key){ return TOPIC_COLORS[key] || 'var(--color-lilac)'; }
-const TOPIC_BLOB_SIZES = [178,148,202,166,184,172,150,192,204,156];
+const TOPIC_BLOB_SIZES = [220,190,240,210,225,215,195,230,245,205];
 function renderTopics(){
   const el = document.getElementById('topics');
   const visible = TOPIC_GROUPS;
