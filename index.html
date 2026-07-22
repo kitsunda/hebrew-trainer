@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <style>
 :root{
-  --color-bg:#eee8dd;
+  --color-bg:#f6f0e3;
   --color-text:#171717;
   --color-text-muted:rgba(23,23,23,.58);
   --color-text-faint:rgba(23,23,23,.38);
@@ -26,14 +26,14 @@
   --color-surface:rgba(255,255,255,.42);
   --color-surface-solid:#f5efe4;
 
-  --color-orange:#f45d32;
-  --color-yellow:#f4c532;
-  --color-blue:#58a9c8;
-  --color-lilac:#a5a2cf;
-  --color-green:#709b78;
-  --color-coral:#f07854;
-  --color-pink:#c9b4c9;
-  --color-mint:#8bb6b5;
+  --color-orange:#df6948;
+  --color-yellow:#e4bd4e;
+  --color-blue:#6caabd;
+  --color-lilac:#aaa8c9;
+  --color-green:#78977f;
+  --color-coral:#df8268;
+  --color-pink:#c5b4c6;
+  --color-mint:#8eb4b0;
 
   --good:#5c9b75;
   --bad:#b6503f;
@@ -47,7 +47,7 @@
   --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px; --space-16:64px;
 
   --ease-out: cubic-bezier(0.22,1,0.36,1);
-  --font-sans: -apple-system,"Inter","Manrope","Helvetica Neue","Segoe UI",Arial,sans-serif;
+  --font-sans: ui-monospace,"SFMono-Regular","IBM Plex Mono","Menlo","Consolas",monospace;
   --font-mono: ui-monospace,"SF Mono","IBM Plex Mono","Menlo","Consolas",monospace;
 }
 
@@ -63,7 +63,7 @@ body{
 }
 /* очень слабое зерно поверх фона — CSS-only, без изображений */
 body::before{
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.018; mix-blend-mode:multiply;
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.025; mix-blend-mode:multiply;
   background-image:
     radial-gradient(circle at 15% 20%, #000 0.55px, transparent 0.75px),
     radial-gradient(circle at 65% 75%, #000 0.45px, transparent 0.7px);
@@ -103,7 +103,7 @@ header.top .eyebrow{
   font-weight:600; margin:0; font-family:var(--font-mono);
 }
 header.top h1{
-  font-family:var(--font-sans); font-size:17px; margin:2px 0 0; font-weight:440; letter-spacing:-.025em; color:var(--color-text);
+  font-family:var(--font-mono); font-size:17px; margin:2px 0 0; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--color-text);
 }
 .profile-switch{border:none; background:none; color:var(--color-text-muted); font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; min-width:52px;min-height:44px;padding:8px 0 8px 12px;}
 .profile-switch:hover{color:var(--color-text);}
@@ -122,8 +122,8 @@ header.top h1{
 
 /* ---------- section titles ---------- */
 .section-title{
-  font-size:14px; font-weight:600; color:var(--color-text); margin:0 0 var(--space-1);
-  letter-spacing:-.005em;
+  font-family:var(--font-mono); font-size:14px; font-weight:600; color:var(--color-text); margin:0 0 var(--space-1);
+  letter-spacing:.08em; text-transform:uppercase;
 }
 .section-sub{font-size:13px; color:var(--color-text-muted); margin:0 0 var(--space-5); font-weight:500;}
 .section-block{margin-bottom:var(--space-10);}
@@ -138,27 +138,31 @@ header.top h1{
 .data-note{font-size:12px; line-height:1.4; color:var(--color-text-muted); margin:var(--space-3) 0 0;}
 
 /* ---------- TopicMap / TopicBlob ---------- */
-.topic-map{display:flex; flex-direction:column; gap:14px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
+.topic-map{display:flex; flex-direction:column; gap:20px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
 .topic-blob{
-  position:relative; border:none; cursor:pointer;
+  position:relative; isolation:isolate; border:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   width:min(calc(var(--blob-size) + 54px),100%);
   height:calc(var(--blob-size) * .72); min-height:80px; padding:var(--space-4) var(--space-5); text-align:center;
-  background:var(--blob-background,radial-gradient(ellipse at 50% 50%,var(--blob-color) 0 24%,color-mix(in srgb,var(--blob-color) 76%,transparent) 43%,transparent 68%));
-  background-repeat:no-repeat; background-size:100% 100%;
-  transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
+  background:transparent;
+  transition:transform .2s var(--ease-out), opacity .25s ease;
   opacity:1;
   filter:saturate(1.08);
   animation:topicIn .55s var(--topic-delay, 0s) var(--ease-out) both;
 }
 .topic-blob::before{
-  display:none;
+  content:''; position:absolute; z-index:-1; pointer-events:none; inset:-24px -20px;
+  border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
+  background:var(--blob-background,radial-gradient(ellipse at 50% 50%,var(--blob-color) 0 24%,color-mix(in srgb,var(--blob-color) 76%,transparent) 43%,transparent 70%));
+  filter:blur(18px); opacity:.82;
+  transition:transform .25s var(--ease-out),opacity .25s ease;
+  animation:cloudDrift var(--topic-drift,8s) ease-in-out var(--topic-delay,0s) infinite alternate;
 }
 .topic-blob.on{opacity:1;filter:saturate(1.08);}
 .topic-blob:not(.on){opacity:.46; filter:saturate(.42);}
 .topic-blob:not(.on)::before{opacity:.58;}
 .topic-blob:hover,.topic-blob:focus-visible{transform:translate(2px,-2px);}
-.topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translate(-50%,-50%) scale(1.045); filter:blur(10px); opacity:1;}
+.topic-blob:hover::before,.topic-blob:focus-visible::before{transform:scale(1.045); opacity:.94;}
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
 .topic-blob.side-right{align-self:flex-end;}
 .topic-blob.with-top-gap{margin-top:3px;}
@@ -166,16 +170,15 @@ header.top h1{
   width:min(86vw,300px); max-width:100%; height:112px; min-height:112px; margin:0 auto 13px; padding:var(--space-5); align-items:center; text-align:center;
 }
 .topic-blob.weekly-topic::before{
-  width:100%; height:104px; transform:translate(-50%,-50%);
-  filter:blur(13px); opacity:.96;
+  inset:-22px -18px; filter:blur(19px); opacity:.86;
 }
 .topic-blob.weekly-topic:hover::before,.topic-blob.weekly-topic:focus-visible::before{
-  transform:translate(-50%,-50%) scale(1.045);
+  transform:scale(1.045);
 }
 .weekly-topic .topic-name{font-size:14px; letter-spacing:.045em;}
 .topic-blob.launching{transform:scale(1.025);pointer-events:none;}
-.topic-blob.launching::before{transform:translate(-50%,-50%) scale(1.1);filter:blur(12px);opacity:1;}
-.topic-blob.weekly-topic.launching::before{transform:translate(-50%,-50%) scale(1.1);}
+.topic-blob.launching::before{transform:scale(1.1);opacity:1;}
+.topic-blob.weekly-topic.launching::before{transform:scale(1.1);}
 .topic-name{
   font-family:var(--font-mono); font-size:14px; font-weight:500; letter-spacing:.038em; text-transform:uppercase;
   color:var(--color-text); line-height:1.3;
@@ -971,16 +974,16 @@ function renderTopics(){
     '49% 51% 34% 66% / 58% 42% 65% 35%'
   ];
   const blobBackgrounds = [
-    'radial-gradient(ellipse at 50% 46%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 78%,transparent) 43%, transparent 68%)',
-    'radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 25%, color-mix(in srgb,var(--blob-color) 80%,transparent) 44%, transparent 69%)',
-    'radial-gradient(ellipse at 48% 46%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 77%,transparent) 42%, transparent 67%)',
-    'radial-gradient(ellipse at 52% 47%, var(--blob-color) 0 26%, color-mix(in srgb,var(--blob-color) 80%,transparent) 45%, transparent 70%)',
-    'radial-gradient(ellipse at 50% 50%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 78%,transparent) 43%, transparent 68%)'
+    'radial-gradient(ellipse at 32% 42%, var(--blob-color) 0 22%, color-mix(in srgb,var(--blob-color) 72%,transparent) 40%, transparent 72%), radial-gradient(ellipse at 70% 64%, color-mix(in srgb,var(--blob-color) 58%,transparent) 0 18%, transparent 62%)',
+    'radial-gradient(ellipse at 62% 38%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 74%,transparent) 43%, transparent 73%), radial-gradient(ellipse at 30% 68%, color-mix(in srgb,var(--blob-color) 54%,transparent) 0 20%, transparent 64%)',
+    'radial-gradient(ellipse at 42% 56%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 73%,transparent) 42%, transparent 72%), radial-gradient(ellipse at 78% 34%, color-mix(in srgb,var(--blob-color) 52%,transparent) 0 18%, transparent 61%)',
+    'radial-gradient(ellipse at 68% 58%, var(--blob-color) 0 25%, color-mix(in srgb,var(--blob-color) 74%,transparent) 44%, transparent 74%), radial-gradient(ellipse at 28% 30%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 19%, transparent 63%)',
+    'radial-gradient(ellipse at 48% 40%, var(--blob-color) 0 21%, color-mix(in srgb,var(--blob-color) 72%,transparent) 39%, transparent 71%), radial-gradient(ellipse at 74% 70%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 62%)'
   ];
   const weeklyIds = LEARNING_VOCAB.filter(w=>w.isWeekly).map(w=>w.id);
   const weeklyCount = weeklyIds.length;
   const weeklyLearned = masteredCount(weeklyIds);
-  const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="--blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:${(weeklyLearned/weeklyCount).toFixed(3)}; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse at 50% 48%, var(--blob-color) 0 33%, color-mix(in srgb,var(--blob-color) 84%,transparent) 50%, transparent 73%)">
+  const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="--blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:${(weeklyLearned/weeklyCount).toFixed(3)}; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 42%, transparent 72%), radial-gradient(ellipse at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 63%)">
     <span class="topic-name">Слова этой недели</span>
     <span class="topic-meta">${weeklyLearned} из ${weeklyCount}</span>
   </button>` : '';
