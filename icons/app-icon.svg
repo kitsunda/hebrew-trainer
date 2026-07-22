@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <filter id="soft" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur stdDeviation="44"/>
+    </filter>
+    <radialGradient id="coral" cx="50%" cy="45%" r="62%">
+      <stop offset="0" stop-color="#f27d62" stop-opacity=".95"/>
+      <stop offset=".48" stop-color="#ef9b7e" stop-opacity=".68"/>
+      <stop offset="1" stop-color="#f6f0e3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="yellow" cx="45%" cy="48%" r="62%">
+      <stop offset="0" stop-color="#edc242" stop-opacity=".94"/>
+      <stop offset=".5" stop-color="#efd782" stop-opacity=".62"/>
+      <stop offset="1" stop-color="#f6f0e3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blue" cx="50%" cy="48%" r="64%">
+      <stop offset="0" stop-color="#69a9c0" stop-opacity=".9"/>
+      <stop offset=".5" stop-color="#9bc7d0" stop-opacity=".58"/>
+      <stop offset="1" stop-color="#f6f0e3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lilac" cx="50%" cy="48%" r="64%">
+      <stop offset="0" stop-color="#aaa5cf" stop-opacity=".86"/>
+      <stop offset=".5" stop-color="#c9c6dc" stop-opacity=".56"/>
+      <stop offset="1" stop-color="#f6f0e3" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="round"><rect width="1024" height="1024" rx="220"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" rx="220" fill="#f6f0e3"/>
+  <g clip-path="url(#round)" filter="url(#soft)" opacity=".94">
+    <ellipse cx="390" cy="270" rx="315" ry="240" fill="url(#coral)" transform="rotate(-12 390 270)"/>
+    <ellipse cx="300" cy="640" rx="330" ry="245" fill="url(#yellow)" transform="rotate(18 300 640)"/>
+    <ellipse cx="735" cy="505" rx="285" ry="235" fill="url(#blue)" transform="rotate(-24 735 505)"/>
+    <ellipse cx="590" cy="785" rx="310" ry="220" fill="url(#lilac)" transform="rotate(-14 590 785)"/>
+  </g>
+  <text x="512" y="655" text-anchor="middle" font-family="Noto Serif Hebrew, Times New Roman, serif" font-size="430" font-weight="700" fill="#191713">א</text>
+</svg>
