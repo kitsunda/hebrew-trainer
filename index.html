@@ -826,7 +826,8 @@ function localStoreKey(){ return `${STORE_PREFIX}${activeProfile||'nastya'}`; }
 const DEFAULT_STATE = {
   boxes:{}, xp:0, streak:0, bestStreak:0, dayStreak:0, lastDate:null, selectedTopics:null,
   lastGoalDate:null, shields:1, achievements:{}, announcedCollectibles:[], totalCorrectEver:0,
-  due:{}, wrongStreaks:{}, reviewStats:{}, mnemonics:{}, vocabVersion:0, verbFamiliesVersion:0
+  due:{}, wrongStreaks:{}, reviewStats:{}, mnemonics:{}, vocabVersion:0, verbFamiliesVersion:0,
+  updatedAt:null
 };
 function normalizeState(candidate){
   if(!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('Некорректный формат прогресса');
@@ -872,26 +873,41 @@ function loadState(){
 }
 let STATE = loadState();
 function saveState(){
+  STATE.updatedAt = new Date().toISOString();
   localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
   clearTimeout(cloudSaveTimer);
   cloudSaveTimer = setTimeout(saveStateToCloud, 500);
 }
+let pendingCloudSync = false;
 async function saveStateToCloud(){
   if(!activeProfile) return;
-  const {error} = await supabaseClient.from('trainer_progress').upsert({profile_id:activeProfile, state:STATE, updated_at:new Date().toISOString()});
-  if(error) console.error('Не удалось сохранить прогресс в облако', error);
+  try{
+    const {error} = await supabaseClient.from('trainer_progress').upsert({profile_id:activeProfile, state:STATE, updated_at:new Date().toISOString()});
+    pendingCloudSync = !!error;
+    if(error) console.error('Не удалось сохранить прогресс в облако', error);
+  }catch(error){
+    pendingCloudSync = true;
+    console.error('Не удалось сохранить прогресс в облако', error);
+  }
 }
 async function loadStateFromCloud(){
   if(!activeProfile) return;
   const app = document.getElementById('appWrap');
   try{
-    const {data, error} = await supabaseClient.from('trainer_progress').select('state').eq('profile_id', activeProfile).maybeSingle();
+    const {data, error} = await supabaseClient.from('trainer_progress').select('state,updated_at').eq('profile_id', activeProfile).maybeSingle();
     if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
     if(data?.state){
       const needsLenyaReset = activeProfile === 'lenya' && data.state.vocabVersion !== 1;
       const needsVerbMigration = data.state.verbFamiliesVersion !== 1;
-      STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
-      if(needsLenyaReset || needsVerbMigration) await saveStateToCloud();
+      const localUpdated = Date.parse(STATE.updatedAt||0)||0;
+      const cloudUpdated = Date.parse(data.state.updatedAt||data.updated_at||0)||0;
+      const keepOfflineProgress = !needsLenyaReset && localUpdated>cloudUpdated;
+      if(keepOfflineProgress){
+        await saveStateToCloud();
+      } else {
+        STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
+        if(needsLenyaReset || needsVerbMigration) await saveStateToCloud();
+      }
       localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
       selectedTopics = new Set(migratedTopics(STATE.selectedTopics));
       renderTopics(); renderPoolHint(); renderStats(); renderGarden();
@@ -902,6 +918,9 @@ async function loadStateFromCloud(){
     app.classList.remove('cloud-loading');
   }
 }
+window.addEventListener('online',()=>{
+  if(pendingCloudSync) saveStateToCloud();
+});
 
 function exportProgress(){
   const payload = { app:'hebrew-trainer', version:1, exportedAt:new Date().toISOString(), state:STATE };
