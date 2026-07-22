@@ -138,7 +138,7 @@ header.top h1{
 .data-note{font-size:12px; line-height:1.4; color:var(--color-text-muted); margin:var(--space-3) 0 0;}
 
 /* ---------- TopicMap / TopicBlob ---------- */
-.topic-map{position:relative; min-height:calc(var(--topic-count,10) * 190px); animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
+.topic-map{position:relative; min-height:calc(var(--topic-count,10) * 190px + 70px); animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
 .topic-color-field{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible;}
 .topic-color-blob{position:absolute;z-index:0;pointer-events:none;left:var(--blob-left,0);top:var(--blob-top,0);width:min(calc(var(--blob-size) + 64px),calc(100% - 72px));height:calc(var(--blob-size) * .78);border-radius:var(--blob-radius,50% 50% 48% 52% / 46% 54% 52% 48%);background:var(--blob-background);filter:blur(34px);opacity:.78;mix-blend-mode:multiply;transform:var(--blob-transform,none);}
 .topic-color-blob.topic-color-left{left:36px;}
@@ -174,7 +174,7 @@ header.top h1{
 .topic-blob.side-right{align-self:flex-end;}
 .topic-blob.with-top-gap{margin-top:3px;}
 .topic-blob.weekly-topic{
-  width:min(86vw,300px); max-width:100%; height:112px; min-height:112px; top:0;left:50%;transform:translateX(-50%); margin:0; padding:var(--space-5); align-items:center; text-align:center;
+  width:min(86vw,300px); max-width:100%; height:112px; min-height:112px; top:var(--blob-top,0);left:50%;transform:translateX(-50%); margin:0; padding:var(--space-5); align-items:center; text-align:center;
 }
 .topic-blob.weekly-topic::before{
   display:none;
@@ -216,8 +216,8 @@ header.top h1{
 
 /* ---------- SESSION ---------- */
 #session{display:none; flex-direction:column; min-height:calc(100svh - 88px); gap:0;}
-body.session-active{height:100svh;overflow:hidden;}
-body.session-active .wrap{height:100svh;overflow:hidden;display:flex;flex-direction:column;padding-left:0;padding-right:0;}
+body.session-active{height:100svh;height:100dvh;overflow:hidden;}
+body.session-active .wrap{height:100svh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 0 calc(12px + env(safe-area-inset-bottom));}
 body.session-active header.top{flex:none;padding-left:var(--space-5);padding-right:var(--space-5);}
 body.session-active #session{flex:1;min-height:0;height:auto;overflow:hidden;}
 body.session-active .stage{min-height:0;overflow:visible;}
@@ -402,13 +402,15 @@ body.session-active .stage{min-height:0;overflow:visible;}
   .stat-main-label{font-size:10px;max-width:116px;}
   .topic-blob{min-height:80px;padding-left:20px;padding-right:20px;}
   #session{min-height:calc(100svh - 76px);}
-  .stage{min-height:0;padding-top:clamp(72px,11vh,104px);padding-bottom:max(70px,calc(env(safe-area-inset-bottom) + 38px));}
+  body.session-active .wrap{padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+  .stage{min-height:0;padding-top:clamp(28px,5vh,48px);padding-bottom:max(8px,env(safe-area-inset-bottom));}
   .stage::before{top:39%;height:270px;}
-  .flash-focus{min-height:320px;}
+  .flip-zone{min-height:292px;}
+  .flash-focus{min-height:292px;}
   .flash-focus::before{height:270px;}
   .flash-focus .topic-tag{top:46px;}
   .topic-tag{margin-bottom:22px;}
-  .know-row{margin-top:auto;padding-top:clamp(42px,7vh,68px);gap:10px;}
+  .know-row{margin-top:auto;padding-top:clamp(12px,2vh,24px);padding-bottom:4px;gap:10px;flex:none;}
   .know-btn{min-width:0;max-width:160px;}
 }
 </style>
@@ -452,6 +454,10 @@ body.session-active .stage{min-height:0;overflow:visible;}
                 <circle cx="36" cy="19" r="1.9"/><circle cx="44.5" cy="21.3" r="1.9"/><circle cx="50.7" cy="27.5" r="1.9"/><circle cx="53" cy="36" r="1.9"/>
                 <circle cx="50.7" cy="44.5" r="1.9"/><circle cx="44.5" cy="50.7" r="1.9"/><circle cx="36" cy="53" r="1.9"/><circle cx="27.5" cy="50.7" r="1.9"/>
                 <circle cx="21.3" cy="44.5" r="1.9"/><circle cx="19" cy="36" r="1.9"/><circle cx="21.3" cy="27.5" r="1.9"/><circle cx="27.5" cy="21.3" r="1.9"/>
+              </g>
+              <g fill="var(--color-orange)" opacity=".9">
+                <circle cx="36" cy="7" r="2.2"/><circle cx="63" cy="36" r="2.2"/>
+                <circle cx="36" cy="65" r="2.2"/><circle cx="9" cy="36" r="2.2"/>
               </g>
               <circle cx="36" cy="36" r="2.8" fill="currentColor"/>
             </svg>
@@ -994,11 +1000,11 @@ function renderTopics(){
   const weeklyCount = weeklyIds.length;
   const weeklyLearned = masteredCount(weeklyIds);
   const topicLayouts = [
-    {top:170,side:'left'}, {top:360,side:'right'}, {top:550,side:'left'}, {top:740,side:'right'},
-    {top:930,side:'left'}, {top:1120,side:'right'}, {top:1310,side:'left'}, {top:1500,side:'right'},
-    {top:1690,side:'left'}, {top:1880,side:'right'}
+    {top:230,side:'left'}, {top:420,side:'right'}, {top:610,side:'left'}, {top:800,side:'right'},
+    {top:990,side:'left'}, {top:1180,side:'right'}, {top:1370,side:'left'}, {top:1560,side:'right'},
+    {top:1750,side:'left'}, {top:1940,side:'right'}
   ];
-  const weeklyStyle = '--blob-top:0px; --blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:'+(weeklyCount ? (weeklyLearned/weeklyCount).toFixed(3) : '0')+'; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-transform:rotate(-4deg) scale(1.03,.92); --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse 72% 76% at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 46%, transparent 100%), radial-gradient(ellipse 52% 56% at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 100%)';
+  const weeklyStyle = '--blob-top:42px; --blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:'+(weeklyCount ? (weeklyLearned/weeklyCount).toFixed(3) : '0')+'; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-transform:rotate(-4deg) scale(1.03,.92); --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse 72% 76% at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 46%, transparent 100%), radial-gradient(ellipse 52% 56% at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 100%)';
   const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic topic-center on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="${weeklyStyle}">
     <span class="topic-name">Слова этой недели</span>
     <span class="topic-meta">${weeklyLearned} из ${weeklyCount}</span>
