@@ -23,3 +23,4 @@ python3 -m http.server 8000
 
 - `index.html` — интерфейс, стили и логика тренажёра
 - `vocab.js` — словарь
+- `manifest.webmanifest` и `icons/` — установка страницы на домашний экран телефона
