@@ -616,7 +616,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 /* ---------- header stats ---------- */
 function masteredCount(ids){
   ids = ids || VOCAB.map(w=>w.id);
-  return ids.filter(id=>boxOf(id)>=3).length;
+  return ids.filter(id=>boxOf(id)>=1).length;
 }
 function renderStats(){
   const mastered = masteredCount();
