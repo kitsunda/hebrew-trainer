@@ -28,10 +28,10 @@
 
   --color-orange:#f45d32;
   --color-yellow:#f4c532;
-  --color-blue:#67aeca;
+  --color-blue:#58a9c8;
   --color-lilac:#a5a2cf;
   --color-green:#709b78;
-  --color-coral:#ee8479;
+  --color-coral:#f07854;
   --color-pink:#c9b4c9;
   --color-mint:#8bb6b5;
 
@@ -79,6 +79,8 @@ button{font-family:inherit;}
   max-width:460px; margin:0 auto; position:relative; z-index:1;
   padding:calc(24px + env(safe-area-inset-top)) var(--space-5) calc(var(--space-12) + env(safe-area-inset-bottom));
 }
+.wrap.cloud-loading #setup{opacity:0;visibility:hidden;}
+#setup{transition:opacity .3s var(--ease-out);}
 .profile-gate{min-height:100vh; display:grid; place-items:center; padding:24px; position:relative; z-index:2;}
 .profile-gate-inner{width:min(100%,390px); text-align:center; animation:riseIn .5s var(--ease-out) both;}
 .profile-gate .eyebrow{margin:0 0 10px;}
@@ -101,9 +103,9 @@ header.top .eyebrow{
   font-weight:600; margin:0; font-family:var(--font-mono);
 }
 header.top h1{
-  font-family:var(--font-sans); font-size:19px; margin:2px 0 0; font-weight:470; letter-spacing:-.025em; color:var(--color-text);
+  font-family:var(--font-sans); font-size:17px; margin:2px 0 0; font-weight:440; letter-spacing:-.025em; color:var(--color-text);
 }
-.profile-switch{border:none; background:none; color:var(--color-text-muted); font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; padding:8px 0 8px 10px;}
+.profile-switch{border:none; background:none; color:var(--color-text-muted); font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; min-width:52px;min-height:44px;padding:8px 0 8px 12px;}
 .profile-switch:hover{color:var(--color-text);}
 
 /* ---------- StatsOverview ---------- */
@@ -136,12 +138,12 @@ header.top h1{
 .data-note{font-size:12px; line-height:1.4; color:var(--color-text-muted); margin:var(--space-3) 0 0;}
 
 /* ---------- TopicMap / TopicBlob ---------- */
-.topic-map{display:flex; flex-direction:column; gap:0; animation:riseIn .55s .2s var(--ease-out) both; padding-bottom:var(--space-8);}
+.topic-map{display:flex; flex-direction:column; gap:7px; animation:riseIn .55s .2s var(--ease-out) both; padding-bottom:var(--space-8);}
 .topic-blob{
   position:relative; isolation:isolate; border:none; background:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
   width:100%;
-  min-height:78px; padding:var(--space-4) var(--space-5); text-align:left;
+  min-height:80px; padding:var(--space-4) var(--space-5); text-align:left;
   transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
   opacity:1;
   filter:saturate(1.08);
@@ -166,8 +168,10 @@ header.top h1{
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
 .topic-blob:nth-child(3n+2){align-self:stretch; align-items:flex-end; text-align:right;}
 .topic-blob:nth-child(3n+2)::before{left:auto; right:0;}
-.topic-blob:nth-child(4n+3){margin-top:-7px;}
-.topic-blob:nth-child(5n+1){margin-top:9px;}
+.topic-blob:nth-child(4n+3){margin-top:0;}
+.topic-blob:nth-child(5n+1){margin-top:3px;}
+.topic-blob.launching{transform:scale(1.025);pointer-events:none;}
+.topic-blob.launching::before{transform:translateY(-50%) scale(1.1);filter:blur(12px);opacity:1;}
 .topic-name{
   font-family:var(--font-mono); font-size:13px; font-weight:480; letter-spacing:.038em; text-transform:uppercase;
   color:var(--color-text); line-height:1.3;
@@ -181,22 +185,27 @@ header.top h1{
 /* ---------- top action ---------- */
 .start-col{display:flex; flex-direction:column; align-items:center; gap:var(--space-1); flex:none; padding-bottom:1px;}
 .btn-primary{
-  position:relative; isolation:isolate; width:82px; height:68px; display:grid; place-items:center; background:transparent; color:var(--color-text);
+  position:relative; isolation:isolate; width:76px; height:76px; display:grid; place-items:center; background:transparent; color:var(--color-text);
   border:0; padding:0; line-height:1; cursor:pointer;
   transition:transform .25s var(--ease-out), color .2s ease; white-space:nowrap;
 }
-.btn-primary::before{content:'';position:absolute;z-index:-1;inset:-8px -10px;border-radius:60% 40% 55% 45% / 47% 62% 38% 53%;background:radial-gradient(ellipse at 48% 47%,var(--color-orange) 0 28%,color-mix(in srgb,var(--color-orange) 86%,transparent) 46%,transparent 74%);filter:blur(11px);opacity:.98;transition:transform .25s var(--ease-out),filter .25s ease;animation:startDrift 7s ease-in-out infinite alternate;}
-.btn-primary svg{width:42px;height:30px;overflow:visible;}
+.btn-primary::before{content:'';position:absolute;z-index:-1;inset:2px;border-radius:50%;background:radial-gradient(circle,var(--color-bg) 0 30%,transparent 56%);opacity:.7;}
+.btn-primary svg{width:70px;height:70px;overflow:visible;}
 .btn-primary:hover,.btn-primary:focus-visible{transform:translateY(-2px) scale(1.04); color:var(--color-text);}
-.btn-primary:hover::before,.btn-primary:focus-visible::before{transform:scale(1.07);filter:blur(13px);}
+.btn-primary:hover svg,.btn-primary:focus-visible svg{animation:orbitTurn 2.6s linear infinite;}
 .btn-primary:active{transform:translateY(0) scale(.94);}
 .btn-primary:disabled{opacity:.35; cursor:not-allowed; transform:none;}
-@keyframes startDrift{from{border-radius:60% 40% 55% 45% / 47% 62% 38% 53%;}to{border-radius:45% 55% 42% 58% / 60% 44% 56% 40%;}}
+@keyframes orbitTurn{to{transform:rotate(360deg);}}
 .start-label{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; color:var(--color-text-muted); text-transform:uppercase;}
 .hint-empty{font-size:10px; color:var(--color-text-muted); font-weight:500; text-align:center; max-width:100px;}
 
 /* ---------- SESSION ---------- */
 #session{display:none; flex-direction:column; min-height:calc(100svh - 88px); gap:0;}
+body.session-active{height:100svh;overflow:hidden;}
+body.session-active .wrap{height:100svh;overflow:hidden;display:flex;flex-direction:column;}
+body.session-active header.top{flex:none;}
+body.session-active #session{flex:1;min-height:0;height:auto;overflow:hidden;}
+body.session-active .stage{min-height:0;overflow:hidden;}
 .session-top{display:flex; align-items:center; justify-content:space-between; gap:var(--space-4);}
 .session-progress{position:relative;flex:1;height:26px;overflow:hidden;background:repeating-linear-gradient(90deg,rgba(23,23,23,.12) 0 2px,transparent 2px 7px);}
 .session-progress-fill{position:absolute;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(90deg,var(--color-text) 0 2px,transparent 2px 7px);transition:width .38s var(--ease-out);}
@@ -217,8 +226,10 @@ header.top h1{
 }
 .stage.correct{animation:calmpulse .3s var(--ease-out);}
 .stage.wrong{animation:calmshake .3s var(--ease-out);}
+.stage.question-enter{animation:questionIn .34s var(--ease-out) both;}
 @keyframes calmpulse{0%{transform:scale(1);}50%{transform:scale(1.01);}100%{transform:scale(1);}}
 @keyframes calmshake{0%,100%{transform:translateX(0);}33%{transform:translateX(-4px);}66%{transform:translateX(4px);}}
+@keyframes questionIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @media (prefers-reduced-motion: reduce){
   .stage.correct,.stage.wrong{animation:none;}
   .topic-blob,.topic-blob::before,header.top,.stats-hero,.topic-map{animation:none !important;}
@@ -242,7 +253,7 @@ header.top h1{
 .flip-zone.revealed .card-front-hint{opacity:0; height:0; overflow:hidden;}
 .hebrew-word{font-weight:520; text-align:center; line-height:1.25; white-space:normal; word-break:break-word; max-width:100%;}
 .translit{font-size:14px; color:var(--color-text-muted); font-weight:500; margin-top:var(--space-2);}
-.russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; max-width:100%; margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--color-line);}
+.russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; max-width:100%; margin-top:var(--space-4); padding-top:var(--space-3);}
 .flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:10px;}
 
 .know-row{display:flex; align-items:center; justify-content:center; gap:var(--space-5); margin-top:auto; padding-top:var(--space-10); width:100%;}
@@ -255,8 +266,7 @@ header.top h1{
 .know-btn.yes::before{background:radial-gradient(ellipse at 52% 44%,var(--color-mint) 0 30%,color-mix(in srgb,var(--color-mint) 80%,transparent) 49%,transparent 74%);border-radius:44% 56% 60% 40% / 58% 43% 57% 42%;}
 .know-btn:hover{opacity:.74;transform:translateY(-1px);}
 .know-btn:hover::before,.know-btn:focus-visible::before{transform:scale(1.05);opacity:1;}
-.know-btn.no{color:var(--bad);}
-.know-btn.yes{color:var(--good);}
+.know-btn.no,.know-btn.yes{color:var(--color-text);}
 
 /* multiple choice */
 .mc-prompt{font-weight:520; margin-bottom:var(--space-8); text-align:center; line-height:1.3; max-width:340px;}
@@ -312,7 +322,7 @@ header.top h1{
 .mnemonic-save{border:none; padding:6px 2px; font-size:12.5px; font-weight:600; background:none; color:var(--color-text); cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
 
 /* summary */
-#summary{display:none; flex-direction:column; align-items:center; gap:var(--space-5); text-align:center; padding:var(--space-8) 0;}
+#summary{display:none; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-6); text-align:center; min-height:calc(100svh - 100px); padding:var(--space-8) 0;}
 #summary .summary-mark{width:40px;height:40px;}
 #summary h2{font-family:inherit; font-size:28px; margin:0; font-weight:520;}
 .summary-grid{display:flex; gap:var(--space-6); flex-wrap:wrap; justify-content:center;}
@@ -320,6 +330,13 @@ header.top h1{
 .summary-stat .n{font-size:22px; font-weight:600; font-variant-numeric:tabular-nums;}
 .summary-stat .l{font-size:11px; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:.05em; font-weight:550; font-family:var(--font-mono);}
 .summary-actions{display:flex; align-items:center; gap:var(--space-5); margin-top:var(--space-2);}
+.summary-cloud{position:relative;isolation:isolate;width:min(86vw,340px);min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.summary-cloud::before{content:'';position:absolute;z-index:-1;inset:-14px;border-radius:51% 49% 58% 42% / 44% 59% 41% 56%;background:radial-gradient(circle at 46% 44%,var(--summary-color,var(--color-yellow)) 0 30%,color-mix(in srgb,var(--summary-color,var(--color-yellow)) 82%,transparent) 48%,transparent 74%);filter:blur(20px);opacity:.9;}
+.summary-cloud .eyebrow{margin:0;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-muted);}
+.summary-cloud h2{font-size:42px!important;font-weight:430!important;letter-spacing:-.05em;}
+.summary-action{position:relative;isolation:isolate;min-width:138px;min-height:66px;border:0;background:none;color:var(--color-text);font-size:14px;font-weight:600;cursor:pointer;}
+.summary-action::before{content:'';position:absolute;z-index:-1;inset:-4px -8px;border-radius:55% 45% 48% 52% / 45% 58% 42% 55%;background:radial-gradient(ellipse,var(--action-color) 0 31%,color-mix(in srgb,var(--action-color) 78%,transparent) 49%,transparent 73%);filter:blur(9px);opacity:.82;}
+.summary-action:hover::before,.summary-action:focus-visible::before{opacity:1;transform:scale(1.05);}
 .btn-ghost{
   background:none; border:none; color:var(--color-text-muted); padding:0;
   font-size:13.5px; font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px;
@@ -347,6 +364,7 @@ header.top h1{
 .showcase-item.locked{opacity:.42; filter:grayscale(.65); transform:scale(.9);}
 .showcase-item.unlocked{opacity:1; transform:scale(1.05);}
 .showcase-item.just-unlocked{animation:bloomIn .75s var(--ease-out) both;}
+.showcase-scroll.has-new-flower{animation:gardenReveal .65s var(--ease-out) both;}
 .showcase-icon{width:54px;height:62px; transition:transform .5s var(--ease-out), filter .5s ease;}
 .showcase-item.locked .showcase-icon{width:42px;height:50px; background-image:none; background-color:transparent; border-radius:0;}
 .showcase-item.locked .showcase-icon svg{opacity:.35;}
@@ -356,6 +374,7 @@ header.top h1{
 .garden-next{display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-3); color:var(--color-text-muted); font-size:12px; line-height:1.45;}
 .garden-next-stem{width:46px; height:2px; background:linear-gradient(90deg,var(--color-green) var(--next-progress,0%), var(--color-line) var(--next-progress,0%)); border-radius:999px;}
 @keyframes bloomIn{0%{opacity:.35;transform:scale(.78);}55%{opacity:1;transform:scale(1.13);}100%{opacity:1;transform:scale(1.05);}}
+@keyframes gardenReveal{from{opacity:0;max-height:0;transform:translateY(-8px);}to{opacity:1;max-height:86px;transform:translateY(0);}}
 
 @media (max-width:380px){
   .stat-simple-num{font-size:clamp(34px,13vw,44px);}
@@ -366,9 +385,9 @@ header.top h1{
   header.top{margin-bottom:24px;}
   .stats-overview{gap:18px;}
   .stat-main-label{font-size:10px;max-width:116px;}
-  .topic-blob{min-height:76px;padding-left:20px;padding-right:20px;}
+  .topic-blob{min-height:80px;padding-left:20px;padding-right:20px;}
   #session{min-height:calc(100svh - 76px);}
-  .stage{min-height:calc(100svh - 126px);padding-top:clamp(92px,16vh,142px);padding-bottom:max(84px,calc(env(safe-area-inset-bottom) + 48px));}
+  .stage{min-height:0;padding-top:clamp(72px,11vh,104px);padding-bottom:max(70px,calc(env(safe-area-inset-bottom) + 38px));}
   .stage::before{top:39%;height:270px;}
   .flash-focus{min-height:320px;}
   .flash-focus::before{height:270px;}
@@ -407,8 +426,20 @@ header.top h1{
         <div id="statsHeroNumber"></div>
         <div class="start-col">
           <button class="btn-primary" id="startBtn" aria-label="Начать тренировку" title="Начать тренировку">
-            <svg viewBox="0 0 52 34" aria-hidden="true" fill="none">
-              <path d="M4 19C16 17 27 17 44 17M34 7C39 11 43 15 47 18C42 22 38 26 33 30" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg viewBox="0 0 72 72" aria-hidden="true">
+              <g opacity=".95">
+                <circle cx="36" cy="5" r="3.4" fill="var(--color-orange)"/><circle cx="51.5" cy="9" r="3" fill="var(--color-coral)"/>
+                <circle cx="63" cy="20.5" r="3.3" fill="var(--color-yellow)"/><circle cx="67" cy="36" r="2.8" fill="var(--color-blue)"/>
+                <circle cx="63" cy="51.5" r="3.4" fill="var(--color-mint)"/><circle cx="51.5" cy="63" r="3" fill="var(--color-lilac)"/>
+                <circle cx="36" cy="67" r="3.3" fill="var(--color-blue)"/><circle cx="20.5" cy="63" r="2.8" fill="var(--color-coral)"/>
+                <circle cx="9" cy="51.5" r="3.4" fill="var(--color-yellow)"/><circle cx="5" cy="36" r="3" fill="var(--color-orange)"/>
+                <circle cx="9" cy="20.5" r="3.3" fill="var(--color-mint)"/><circle cx="20.5" cy="9" r="2.8" fill="var(--color-lilac)"/>
+              </g>
+              <g fill="var(--color-text)" opacity=".28">
+                <circle cx="36" cy="18" r="1.8"/><circle cx="49" cy="23" r="1.8"/><circle cx="54" cy="36" r="1.8"/><circle cx="49" cy="49" r="1.8"/>
+                <circle cx="36" cy="54" r="1.8"/><circle cx="23" cy="49" r="1.8"/><circle cx="18" cy="36" r="1.8"/><circle cx="23" cy="23" r="1.8"/>
+              </g>
+              <circle cx="36" cy="36" r="3.4" fill="var(--color-text)"/>
             </svg>
           </button>
           <span class="hint-empty" id="poolHint"></span>
@@ -582,17 +613,22 @@ async function saveStateToCloud(){
 }
 async function loadStateFromCloud(){
   if(!activeProfile) return;
-  const {data, error} = await supabaseClient.from('trainer_progress').select('state').eq('profile_id', activeProfile).maybeSingle();
-  if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
-  if(data?.state){
-    const needsLenyaReset = activeProfile === 'lenya' && data.state.vocabVersion !== 1;
-    STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
-    if(needsLenyaReset) await saveStateToCloud();
-    localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
-    selectedTopics = new Set(migratedTopics(STATE.selectedTopics));
-    renderTopics(); renderPoolHint(); renderStats(); renderGarden();
-  } else {
-    await saveStateToCloud();
+  const app = document.getElementById('appWrap');
+  try{
+    const {data, error} = await supabaseClient.from('trainer_progress').select('state').eq('profile_id', activeProfile).maybeSingle();
+    if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
+    if(data?.state){
+      const needsLenyaReset = activeProfile === 'lenya' && data.state.vocabVersion !== 1;
+      STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
+      if(needsLenyaReset) await saveStateToCloud();
+      localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
+      selectedTopics = new Set(migratedTopics(STATE.selectedTopics));
+      renderTopics(); renderPoolHint(); renderStats(); renderGarden();
+    } else {
+      await saveStateToCloud();
+    }
+  } finally {
+    app.classList.remove('cloud-loading');
   }
 }
 
@@ -659,6 +695,13 @@ function pluralDays(n){
   if(n10===1) return 'день';
   if(n10>=2&&n10<=4) return 'дня';
   return 'дней';
+}
+function pluralWords(n){
+  const n10=n%10, n100=n%100;
+  if(n100>=11&&n100<=14) return 'слов';
+  if(n10===1) return 'слово';
+  if(n10>=2&&n10<=4) return 'слова';
+  return 'слов';
 }
 /* Дневная цель упрощена по просьбе: не счётчик слов, а факт «сыграл хотя бы одну
    сессию сегодня» — вызывается один раз при завершении сессии (finishSession). */
@@ -730,7 +773,7 @@ const TOPIC_COLORS = {
   health:'var(--color-coral)', transport:'var(--color-mint)', idioms:'var(--color-blue)', songs:'var(--color-lilac)'
 };
 function blobColorFor(key){ return TOPIC_COLORS[key] || 'var(--color-lilac)'; }
-const TOPIC_BLOB_SIZES = [188,154,218,174,194,180,158,204,216,162];
+const TOPIC_BLOB_SIZES = [178,148,202,166,184,172,150,192,204,156];
 function renderTopics(){
   const el = document.getElementById('topics');
   const visible = TOPIC_GROUPS;
@@ -758,14 +801,15 @@ function renderTopics(){
     const size = TOPIC_BLOB_SIZES[index%TOPIC_BLOB_SIZES.length];
     const color = blobColorFor(g.key);
     const finalOpacity = on ? 1 : .46;
-    return `<button class="topic-blob on" data-key="${g.key}" aria-label="Начать тему «${g.label}» — ${count} слов" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${(index*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
+    return `<button class="topic-blob on" data-key="${g.key}" aria-label="Начать тему «${g.label}» — ${count} ${pluralWords(count)}" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${(index*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
       <span class="topic-name">${g.label}</span>
       <span class="topic-meta">${learned} из ${count}</span>
     </button>`;
   }).join('');
   el.querySelectorAll('.topic-blob').forEach(chip=>{
     chip.addEventListener('click', ()=>{
-      startSession(chip.dataset.key);
+      chip.classList.add('launching');
+      setTimeout(()=>startSession(chip.dataset.key), reduceMotion ? 0 : 160);
     });
   });
 }
@@ -834,14 +878,14 @@ function renderGarden(justUnlocked=[]){
       <div class="showcase-icon" style="--flower-x:${(col*11.111).toFixed(3)}%;--flower-y:${(row*25).toFixed(3)}%;"></div>
     </div>`;
   }).join('');
+  grid.classList.toggle('has-new-flower', justUnlocked.length>0);
   grid.style.display = unlockedFlowers.length ? 'flex' : 'none';
   const next = GARDEN.find(f=>!STATE.announcedCollectibles.includes(f.id));
   const nextEl = document.getElementById('gardenNext');
   if(!next){ nextEl.innerHTML = '<span>Сад полностью распустился</span>'; return; }
   const nextProgress = gardenProgress(next);
   const remaining = nextProgress.target-nextProgress.current;
-  const word = remaining===1 ? 'слово' : (remaining%10>=2 && remaining%10<=4 && (remaining%100<10 || remaining%100>=20) ? 'слова' : 'слов');
-  nextEl.innerHTML = `<span>Чтобы расцвёл следующий цветок, выучи ещё ${remaining} ${word}</span>`;
+  nextEl.innerHTML = `<span>Чтобы расцвёл следующий цветок, выучи ещё ${remaining} ${pluralWords(remaining)}</span>`;
 }
 function checkGarden(){
   let unlockedNew = false;
@@ -898,6 +942,7 @@ function startSession(topicKey=null){
   document.getElementById('setup').style.display = 'none';
   document.getElementById('summary').style.display = 'none';
   document.getElementById('session').style.display = 'flex';
+  document.body.classList.add('session-active');
   renderQuestion();
 }
 document.getElementById('startBtn').addEventListener('click', ()=>startSession());
@@ -915,7 +960,7 @@ function renderQuestion(){
   updateSessionProgress();
   const w = session.queue[session.i];
   const stage = document.getElementById('stage');
-  stage.className = 'stage';
+  stage.className = 'stage question-enter';
   const groupLabel = TOPIC_GROUPS.find(g=>g.key===w.group)?.label || '';
   if(session.mode==='flash') renderFlash(stage, w, groupLabel);
   else if(session.mode==='mc') renderMC(stage, w, groupLabel);
@@ -924,6 +969,7 @@ function renderQuestion(){
 
 function afterAnswer(isCorrect, w, xpGain){
   const stage = document.getElementById('stage');
+  stage.classList.remove('question-enter');
   stage.classList.add(isCorrect?'correct':'wrong');
   if(isCorrect){
     STATE.streak++; STATE.bestStreak = Math.max(STATE.bestStreak, STATE.streak);
@@ -1120,6 +1166,7 @@ function renderType(stage, w, groupLabel){
 
 /* ---------- summary ---------- */
 function finishSession(){
+  document.body.classList.remove('session-active');
   document.getElementById('session').style.display = 'none';
   const s = document.getElementById('summary');
   s.style.display = 'flex';
@@ -1131,22 +1178,20 @@ function finishSession(){
   completeDailyGoalIfNeeded();
   saveState(); renderStats();
   checkGarden();
-  const markR = 15, markC = 2*Math.PI*markR;
-  const markColor = acc>=70 ? 'var(--good)' : 'var(--color-orange)';
-  const summaryMark = `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="${markR}" fill="none" stroke="var(--color-line)" stroke-width="2.5"/><circle cx="20" cy="20" r="${markR}" fill="none" stroke="${markColor}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${markC}" stroke-dashoffset="${markC-markC*acc/100}" transform="rotate(-90 20 20)"/></svg>`;
+  const summaryColor = acc>=70 ? 'var(--color-mint)' : 'var(--color-orange)';
   s.innerHTML = `
-    <div class="summary-mark">${summaryMark}</div>
-    <p class="eyebrow">Сессия завершена</p>
-    <h2>${acc}% правильно</h2>
-    <div class="summary-grid">
-      <div class="summary-stat"><span class="n">${session.correct}</span><span class="l">верно</span></div>
-      <div class="summary-stat"><span class="n">${session.wrong}</span><span class="l">ошибок</span></div>
-      <div class="summary-stat"><span class="n">+${xpGained}</span><span class="l">опыта</span></div>
-      <div class="summary-stat"><span class="n">${STATE.bestStreak}</span><span class="l">лучшая серия</span></div>
+    <div class="summary-cloud" style="--summary-color:${summaryColor}">
+      <p class="eyebrow">Сессия завершена</p>
+      <h2>${acc}%</h2>
+      <div class="summary-grid">
+        <div class="summary-stat"><span class="n">${session.correct}</span><span class="l">верно</span></div>
+        <div class="summary-stat"><span class="n">${session.wrong}</span><span class="l">ошибок</span></div>
+        <div class="summary-stat"><span class="n">+${xpGained}</span><span class="l">опыта</span></div>
+      </div>
     </div>
     <div class="summary-actions">
-      ${session.missed.length? '<button class="btn-ghost" id="retryMissed">Повторить ошибки</button>' : ''}
-      <button class="btn-ghost" id="newSession">На главную</button>
+      ${session.missed.length? '<button class="summary-action" style="--action-color:var(--color-coral)" id="retryMissed">Повторить ошибки</button>' : ''}
+      <button class="summary-action" style="--action-color:var(--color-blue)" id="newSession">На главную</button>
     </div>
   `;
   if(session.missed.length){
@@ -1155,6 +1200,7 @@ function finishSession(){
       session = { queue: missed, pool: session.pool, i:0, mode: session.mode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], fullDeck:false };
       s.style.display='none';
       document.getElementById('session').style.display='flex';
+      document.body.classList.add('session-active');
       renderQuestion();
     });
   }
@@ -1162,6 +1208,7 @@ function finishSession(){
 }
 
 function endSession(){
+  document.body.classList.remove('session-active');
   session = null;
   document.getElementById('session').style.display = 'none';
   document.getElementById('summary').style.display = 'none';
@@ -1199,6 +1246,7 @@ function applyProfileUI(){
   app.style.display = hasProfile ? '' : 'none';
   if(hasProfile){
     switcher.textContent = PROFILE_NAMES[activeProfile] || activeProfile;
+    app.classList.add('cloud-loading');
     loadStateFromCloud();
   }
 }
