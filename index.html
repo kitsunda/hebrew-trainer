@@ -140,23 +140,22 @@ header.top h1{
 /* ---------- TopicMap / TopicBlob ---------- */
 .topic-map{display:flex; flex-direction:column; gap:20px; animation:riseIn .55s .2s var(--ease-out) both; padding:0 10px var(--space-8); overflow:visible;}
 .topic-blob{
-  position:relative; isolation:isolate; border:none; cursor:pointer;
+  position:relative; border:none; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   width:min(calc(var(--blob-size) + 54px),100%);
   height:calc(var(--blob-size) * .72); min-height:80px; padding:var(--space-4) var(--space-5); text-align:center;
-  background:transparent;
+  background:var(--blob-background,radial-gradient(ellipse 68% 76% at 50% 50%,var(--blob-color) 0 24%,color-mix(in srgb,var(--blob-color) 76%,transparent) 48%,transparent 100%));
+  background-repeat:no-repeat; background-size:100% 100%;
+  -webkit-mask-image:radial-gradient(ellipse 46% 58% at 50% 50%,#000 0 45%,transparent 100%);
+  mask-image:radial-gradient(ellipse 46% 58% at 50% 50%,#000 0 45%,transparent 100%);
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
   transition:transform .2s var(--ease-out), opacity .25s ease;
   opacity:1;
   filter:saturate(1.08);
   animation:topicIn .55s var(--topic-delay, 0s) var(--ease-out) both;
 }
 .topic-blob::before{
-  content:''; position:absolute; z-index:-1; pointer-events:none; inset:-24px -20px;
-  border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
-  background:var(--blob-background,radial-gradient(ellipse at 50% 50%,var(--blob-color) 0 24%,color-mix(in srgb,var(--blob-color) 76%,transparent) 43%,transparent 70%));
-  filter:blur(18px); opacity:.82;
-  transition:transform .25s var(--ease-out),opacity .25s ease;
-  animation:cloudDrift var(--topic-drift,8s) ease-in-out var(--topic-delay,0s) infinite alternate;
+  display:none;
 }
 .topic-blob.on{opacity:1;filter:saturate(1.08);}
 .topic-blob:not(.on){opacity:.46; filter:saturate(.42);}
@@ -170,7 +169,7 @@ header.top h1{
   width:min(86vw,300px); max-width:100%; height:112px; min-height:112px; margin:0 auto 13px; padding:var(--space-5); align-items:center; text-align:center;
 }
 .topic-blob.weekly-topic::before{
-  inset:-22px -18px; filter:blur(19px); opacity:.86;
+  display:none;
 }
 .topic-blob.weekly-topic:hover::before,.topic-blob.weekly-topic:focus-visible::before{
   transform:scale(1.045);
@@ -974,16 +973,16 @@ function renderTopics(){
     '49% 51% 34% 66% / 58% 42% 65% 35%'
   ];
   const blobBackgrounds = [
-    'radial-gradient(ellipse at 32% 42%, var(--blob-color) 0 22%, color-mix(in srgb,var(--blob-color) 72%,transparent) 40%, transparent 72%), radial-gradient(ellipse at 70% 64%, color-mix(in srgb,var(--blob-color) 58%,transparent) 0 18%, transparent 62%)',
-    'radial-gradient(ellipse at 62% 38%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 74%,transparent) 43%, transparent 73%), radial-gradient(ellipse at 30% 68%, color-mix(in srgb,var(--blob-color) 54%,transparent) 0 20%, transparent 64%)',
-    'radial-gradient(ellipse at 42% 56%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 73%,transparent) 42%, transparent 72%), radial-gradient(ellipse at 78% 34%, color-mix(in srgb,var(--blob-color) 52%,transparent) 0 18%, transparent 61%)',
-    'radial-gradient(ellipse at 68% 58%, var(--blob-color) 0 25%, color-mix(in srgb,var(--blob-color) 74%,transparent) 44%, transparent 74%), radial-gradient(ellipse at 28% 30%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 19%, transparent 63%)',
-    'radial-gradient(ellipse at 48% 40%, var(--blob-color) 0 21%, color-mix(in srgb,var(--blob-color) 72%,transparent) 39%, transparent 71%), radial-gradient(ellipse at 74% 70%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 62%)'
+    'radial-gradient(ellipse 70% 78% at 32% 42%, var(--blob-color) 0 22%, color-mix(in srgb,var(--blob-color) 72%,transparent) 48%, transparent 100%), radial-gradient(ellipse 54% 56% at 70% 64%, color-mix(in srgb,var(--blob-color) 58%,transparent) 0 18%, transparent 100%)',
+    'radial-gradient(ellipse 68% 74% at 62% 38%, var(--blob-color) 0 24%, color-mix(in srgb,var(--blob-color) 74%,transparent) 50%, transparent 100%), radial-gradient(ellipse 50% 58% at 30% 68%, color-mix(in srgb,var(--blob-color) 54%,transparent) 0 20%, transparent 100%)',
+    'radial-gradient(ellipse 72% 76% at 42% 56%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 73%,transparent) 48%, transparent 100%), radial-gradient(ellipse 48% 52% at 78% 34%, color-mix(in srgb,var(--blob-color) 52%,transparent) 0 18%, transparent 100%)',
+    'radial-gradient(ellipse 70% 80% at 68% 58%, var(--blob-color) 0 25%, color-mix(in srgb,var(--blob-color) 74%,transparent) 50%, transparent 100%), radial-gradient(ellipse 54% 54% at 28% 30%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 19%, transparent 100%)',
+    'radial-gradient(ellipse 68% 76% at 48% 40%, var(--blob-color) 0 21%, color-mix(in srgb,var(--blob-color) 72%,transparent) 46%, transparent 100%), radial-gradient(ellipse 52% 56% at 74% 70%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 100%)'
   ];
   const weeklyIds = LEARNING_VOCAB.filter(w=>w.isWeekly).map(w=>w.id);
   const weeklyCount = weeklyIds.length;
   const weeklyLearned = masteredCount(weeklyIds);
-  const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="--blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:${(weeklyLearned/weeklyCount).toFixed(3)}; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 42%, transparent 72%), radial-gradient(ellipse at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 63%)">
+  const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="--blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:${(weeklyLearned/weeklyCount).toFixed(3)}; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse 72% 76% at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 46%, transparent 100%), radial-gradient(ellipse 52% 56% at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 100%)">
     <span class="topic-name">Слова этой недели</span>
     <span class="topic-meta">${weeklyLearned} из ${weeklyCount}</span>
   </button>` : '';
