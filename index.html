@@ -751,7 +751,7 @@ function gardenProgress(f){
   return {current:unlocked?1:0, target:1, label:unlocked?'открыто':'ещё впереди'};
 }
 function renderGarden(justUnlocked=[]){
-  document.getElementById('gardenGrid').innerHTML = GARDEN.map(f=>{
+  document.getElementById('gardenGrid').innerHTML = GARDEN.map((f,index)=>{
     const unlocked = STATE.announcedCollectibles.includes(f.id);
     const progress = gardenProgress(f);
     const col = f.imageIndex % 10;
@@ -759,7 +759,7 @@ function renderGarden(justUnlocked=[]){
     return `<div class="showcase-item ${unlocked?'unlocked':'locked'} ${justUnlocked.includes(f.id)?'just-unlocked':''}" title="${f.desc}">
       <div class="showcase-icon" style="--flower-x:${(col*11.111).toFixed(3)}%;--flower-y:${(row*25).toFixed(3)}%;"></div>
       <span class="showcase-name">${f.name}</span>
-      <span class="showcase-req">${unlocked?'открыто':progress.label}</span>
+      <span class="showcase-req">${unlocked?'открыто':(index===0 ? progress.label : f.costLabel)}</span>
     </div>`;
   }).join('');
   const next = GARDEN.find(f=>!STATE.announcedCollectibles.includes(f.id));
