@@ -472,9 +472,13 @@ body.session-active .stage{min-height:0;overflow:visible;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="vocab.js"></script>
 <script src="lenya-vocab.js"></script>
+<script src="verb-families.js"></script>
 <script>
   if (localStorage.getItem('hebrewTrainer_activeProfile') === 'lenya') {
     window.VOCAB = window.LENYA_VOCAB;
+    window.VERB_FAMILIES = window.LENYA_VERB_FAMILIES;
+  } else {
+    window.VERB_FAMILIES = window.NASTYA_VERB_FAMILIES;
   }
 </script>
 <script>
@@ -554,10 +558,43 @@ function groupOf(topic, word){
 VOCAB.forEach((w,i)=>{
   w.id = i;
   w.group = groupOf(w.g, w);
+  // Старые записи смешивали инфинитивы, отдельные спряжения, существительные
+  // и целые предложения. Они остаются контекстом, но больше не считаются
+  // самостоятельными глаголами и не попадают в очередь карточек.
+  w.isLegacyVerb = w.group==='verbs';
   // Длинные предложения остаются в базе как контекст для карточек,
   // но не превращаются в отдельные пункты тренировки.
   w.isExample = looksLikeLongExample(w);
 });
+
+const VERB_FORM_SPECS = [
+  {key:'infinitive', label:'ИНФИНИТИВ'},
+  {key:'past', label:'ОН · ПРОШЕДШЕЕ'},
+  {key:'present', label:'Я · НАСТОЯЩЕЕ · М.Р.'},
+];
+const VERB_FAMILIES = Array.isArray(window.VERB_FAMILIES) ? window.VERB_FAMILIES : [];
+const VERB_CARDS = [];
+VERB_FAMILIES.forEach(family=>{
+  VERB_FORM_SPECS.forEach(form=>{
+    const hebrew = family[form.key];
+    if(!hebrew) return; // למשל, у להיות нет обычной формы настоящего времени.
+    VERB_CARDS.push({
+      id:`verb:${family.id}:${form.key}`,
+      h:hebrew,
+      t:'',
+      r:family.meaning,
+      g:'глаголы',
+      k:'word',
+      group:'verbs',
+      isExample:false,
+      isLegacyVerb:false,
+      verbFamilyId:family.id,
+      verbForm:form.key,
+      formLabel:form.label,
+    });
+  });
+});
+VOCAB.push(...VERB_CARDS);
 
 /* Контекст усиливает запоминание почти так же сильно, как активное вспоминание
    (Broek et al., 2022) — при повторе показываем фразу/предложение, где то же
@@ -572,8 +609,19 @@ VOCAB.forEach(w=>{
 });
 
 const GROUP_COUNTS = {};
-VOCAB.forEach(w=>{ if(!w.isExample) GROUP_COUNTS[w.group] = (GROUP_COUNTS[w.group]||0)+1; });
-const LEARNING_VOCAB = VOCAB.filter(w=>!w.isExample);
+VOCAB.forEach(w=>{
+  if(!w.isExample && !w.isLegacyVerb && w.group!=='verbs') GROUP_COUNTS[w.group] = (GROUP_COUNTS[w.group]||0)+1;
+});
+GROUP_COUNTS.verbs = VERB_FAMILIES.length;
+const LEARNING_VOCAB = VOCAB.filter(w=>!w.isExample && !w.isLegacyVerb);
+const LEARNING_BY_ID = new Map(LEARNING_VOCAB.map(w=>[String(w.id),w]));
+const VERB_CARD_IDS_BY_FAMILY = new Map();
+VERB_CARDS.forEach(w=>{
+  const ids = VERB_CARD_IDS_BY_FAMILY.get(w.verbFamilyId) || [];
+  ids.push(w.id);
+  VERB_CARD_IDS_BY_FAMILY.set(w.verbFamilyId, ids);
+});
+const TOTAL_LEARNING_UNITS = LEARNING_VOCAB.filter(w=>!w.verbFamilyId).length + VERB_FAMILIES.length;
 
 const STORE_PREFIX = 'hebrewTrainer_v1_';
 const PROFILE_NAMES = {nastya:'Настя', lenya:'Лёня'};
@@ -586,11 +634,11 @@ function localStoreKey(){ return `${STORE_PREFIX}${activeProfile||'nastya'}`; }
 const DEFAULT_STATE = {
   boxes:{}, xp:0, streak:0, bestStreak:0, dayStreak:0, lastDate:null, selectedTopics:null,
   lastGoalDate:null, shields:1, achievements:{}, announcedCollectibles:[], totalCorrectEver:0,
-  due:{}, wrongStreaks:{}, mnemonics:{}, vocabVersion:0
+  due:{}, wrongStreaks:{}, mnemonics:{}, vocabVersion:0, verbFamiliesVersion:0
 };
 function normalizeState(candidate){
   if(!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('Некорректный формат прогресса');
-  return {
+  const normalized = {
     ...DEFAULT_STATE,
     ...candidate,
     boxes:{...(candidate.boxes||{})},
@@ -600,6 +648,27 @@ function normalizeState(candidate){
     wrongStreaks:{...(candidate.wrongStreaks||{})},
     mnemonics:{...(candidate.mnemonics||{})}
   };
+  if((normalized.verbFamiliesVersion||0)<1){
+    const cardsByForm = new Map();
+    VERB_CARDS.forEach(card=>{
+      const ids = cardsByForm.get(card.h) || [];
+      ids.push(card.id);
+      cardsByForm.set(card.h, ids);
+    });
+    VOCAB.filter(w=>w.isLegacyVerb).forEach(oldWord=>{
+      const oldKey = String(oldWord.id);
+      const oldBox = Number(normalized.boxes[oldKey]||0);
+      if(oldBox<1) return;
+      hebrewTokens(oldWord.h).forEach(token=>{
+        (cardsByForm.get(token)||[]).forEach(newId=>{
+          normalized.boxes[newId] = Math.max(Number(normalized.boxes[newId]||0), oldBox);
+          if(normalized.due[oldKey] && !normalized.due[newId]) normalized.due[newId] = normalized.due[oldKey];
+        });
+      });
+    });
+    normalized.verbFamiliesVersion = 1;
+  }
+  return normalized;
 }
 function loadState(){
   try{
@@ -627,8 +696,9 @@ async function loadStateFromCloud(){
     if(error){ console.error('Не удалось загрузить прогресс из облака', error); return; }
     if(data?.state){
       const needsLenyaReset = activeProfile === 'lenya' && data.state.vocabVersion !== 1;
+      const needsVerbMigration = data.state.verbFamiliesVersion !== 1;
       STATE = needsLenyaReset ? normalizeState({vocabVersion:1}) : normalizeState(data.state);
-      if(needsLenyaReset) await saveStateToCloud();
+      if(needsLenyaReset || needsVerbMigration) await saveStateToCloud();
       localStorage.setItem(localStoreKey(), JSON.stringify(STATE));
       selectedTopics = new Set(migratedTopics(STATE.selectedTopics));
       renderTopics(); renderPoolHint(); renderStats(); renderGarden();
@@ -739,8 +809,17 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 /* ---------- header stats ---------- */
 function masteredCount(ids){
-  ids = ids || LEARNING_VOCAB.map(w=>w.id);
-  return ids.filter(id=>boxOf(id)>=1).length;
+  const cards = ids
+    ? ids.map(id=>LEARNING_BY_ID.get(String(id))).filter(Boolean)
+    : LEARNING_VOCAB;
+  const ordinary = cards.filter(w=>!w.verbFamilyId && boxOf(w.id)>=1).length;
+  const families = new Set(cards.filter(w=>w.verbFamilyId).map(w=>w.verbFamilyId));
+  let learnedFamilies = 0;
+  families.forEach(familyId=>{
+    const formIds = VERB_CARD_IDS_BY_FAMILY.get(familyId)||[];
+    if(formIds.length && formIds.every(id=>boxOf(id)>=1)) learnedFamilies++;
+  });
+  return ordinary + learnedFamilies;
 }
 function renderStats(){
   const mastered = masteredCount();
@@ -749,7 +828,7 @@ function renderStats(){
     <div class="stats-overview">
       <div class="stat-main">
         <span class="stat-main-num">${mastered}</span>
-        <span class="stat-main-label"><strong>из ${LEARNING_VOCAB.length}</strong> слов помню</span>
+        <span class="stat-main-label"><strong>из ${TOTAL_LEARNING_UNITS}</strong> слов помню</span>
       </div>
       <div class="stat-streak">
         <span class="stat-streak-num">${streak}</span>
@@ -803,7 +882,7 @@ function renderTopics(){
     const index = visible.indexOf(g);
     const on = true;
     const count = GROUP_COUNTS[g.key]||0;
-    const ids = VOCAB.filter(w=>w.group===g.key && !w.isExample).map(w=>w.id);
+    const ids = LEARNING_VOCAB.filter(w=>w.group===g.key).map(w=>w.id);
     const learned = masteredCount(ids);
     const progress = count ? learned/count : 0;
     const size = TOPIC_BLOB_SIZES[index%TOPIC_BLOB_SIZES.length];
@@ -970,9 +1049,10 @@ function renderQuestion(){
   const stage = document.getElementById('stage');
   stage.className = 'stage question-enter';
   const groupLabel = TOPIC_GROUPS.find(g=>g.key===w.group)?.label || '';
-  if(session.mode==='flash') renderFlash(stage, w, groupLabel);
-  else if(session.mode==='mc') renderMC(stage, w, groupLabel);
-  else renderType(stage, w, groupLabel);
+  const cardLabel = w.formLabel || groupLabel;
+  if(session.mode==='flash') renderFlash(stage, w, cardLabel);
+  else if(session.mode==='mc') renderMC(stage, w, cardLabel);
+  else renderType(stage, w, cardLabel);
 }
 
 function afterAnswer(isCorrect, w, xpGain){
