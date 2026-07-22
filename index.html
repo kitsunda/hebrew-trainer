@@ -412,19 +412,17 @@ header.top h1{
 <script>
 
 const TOPIC_GROUPS = [
-  {key:'grammar', label:'Грамматика', test:t=>/грамматик/.test(t)},
-  {key:'verbs', label:'Глаголы', test:t=>/глагол|биньян|спряжен/.test(t)},
-  {key:'songs', label:'Песни', test:t=>/песня|молитва/.test(t)},
-  {key:'health', label:'Здоровье', test:t=>/здоровье/.test(t)},
-  {key:'idioms', label:'Идиомы и сленг', test:t=>/идиом|сленг/.test(t)},
-  {key:'work', label:'Работа', test:t=>/работа/.test(t)},
-  {key:'bank', label:'Банк и финансы', test:t=>/банк/.test(t)},
-  {key:'food', label:'Еда', test:t=>/^еда$|покупки\/еда/.test(t)},
-  {key:'lexicon', label:'Общая лексика', test:t=>/^лексика$|^слова$/.test(t)},
-  {key:'phrases', label:'Фразы', test:t=>/^фразы$/.test(t)},
+  {key:'verbs', label:'Глаголы'},
+  {key:'grammar', label:'Грамматика'},
+  {key:'everyday', label:'Повседневное'},
+  {key:'phrases', label:'Фразы'},
+  {key:'food', label:'Еда'},
+  {key:'work', label:'Работа'},
+  {key:'health', label:'Здоровье'},
+  {key:'transport', label:'Передвижение'},
+  {key:'idioms', label:'Идиомы и сленг'},
+  {key:'songs', label:'Песни'},
 ];
-/* Новости/покупки/одежда/диалоги/прочее — слишком мало слов для отдельных тем,
-   по просьбе объединены в «Общая лексика» (см. groupOf: фолбэк теперь lexicon). */
 function hebrewFontSize(text){
   const len = (text||'').length;
   if(len<=10) return 'clamp(30px,6vw,42px)';
@@ -440,13 +438,28 @@ function russianFontSize(text){
   if(len<=50) return '16.5px';
   return '14.5px';
 }
-function groupOf(topic){
+function groupOf(topic, word){
   const t = (topic||'').toLowerCase();
-  for(const g of TOPIC_GROUPS) if(g.test && g.test(t)) return g.key;
-  return 'lexicon';
+  const text = `${word?.h||''} ${word?.r||''}`.toLowerCase();
+  if(/песня|молитва|стих|текст песни|שיר|מילים לשיר/.test(`${t} ${text}`)) return 'songs';
+  if(/идиом|сленг|ביטוי|סלנג|дословно|в контексте|что ты ко мне привязался|глупости/.test(`${t} ${text}`)) return 'idioms';
+  if(/здоров|тело|врач|лекар|боль|привив|болез|רופא|בריאות|חיסון|כאב/.test(`${t} ${text}`)) return 'health';
+  if(/работ|банк|финанс|деньг|зарплат|должност|офис|клиент|целевая аудит|работа|עבודה|בנק|כסף|משכורת|תפקיד/.test(`${t} ${text}`)) return 'work';
+  if(/еда|покуп|ресторан|завтрак|обед|ужин|мяс|хлеб|сыр|вода|напит|готов|жар|кухн|магазин|רесторан|אוכל|קניות|לחם|בשר|מים|חנות/.test(`${t} ${text}`)) return 'food';
+  if(/переезд|переезж|дорог|машин|автобус|поезд|самол|такси|улиц|город|пляж|путешеств|гулять|возвращ|приех|приход|בוא|חזור|נסיעה|אוטובוס|רכבת|עיר|חוף/.test(`${t} ${text}`)) return 'transport';
+  if(/грамматик|предлог|местоим|суффикс|связк|пассив|степен|время|спряжен|конструкц|биньян|модаль|עברית דקדוק/.test(`${t} ${text}`)) return 'grammar';
+  if(/глагол|инфинитив|делать|хотеть|мочь|должен|купить|пить|работать|принос|возвращ|строить|говорить|смеять|готовить|ל[א-ת]{2,}/.test(`${t} ${text}`)) return 'verbs';
+  if(word?.k==='phrase' || word?.k==='sentence' || /^фразы$/.test(t)) return 'phrases';
+  return 'everyday';
 }
 
-VOCAB.forEach((w,i)=>{ w.id = i; w.group = groupOf(w.g); });
+VOCAB.forEach((w,i)=>{
+  w.id = i;
+  w.group = groupOf(w.g, w);
+  // Длинные предложения остаются в базе как контекст для карточек,
+  // но не превращаются в отдельные пункты тренировки.
+  w.isExample = w.k === 'sentence' && ((w.h||'').length > 28 || (w.r||'').length > 46);
+});
 
 /* Контекст усиливает запоминание почти так же сильно, как активное вспоминание
    (Broek et al., 2022) — при повторе показываем фразу/предложение, где то же
@@ -461,7 +474,7 @@ VOCAB.forEach(w=>{
 });
 
 const GROUP_COUNTS = {};
-VOCAB.forEach(w=>{ GROUP_COUNTS[w.group] = (GROUP_COUNTS[w.group]||0)+1; });
+VOCAB.forEach(w=>{ if(!w.isExample) GROUP_COUNTS[w.group] = (GROUP_COUNTS[w.group]||0)+1; });
 
 const STORE_PREFIX = 'hebrewTrainer_v1_';
 const PROFILE_NAMES = {nastya:'Настя', lenya:'Лёня'};
@@ -673,7 +686,7 @@ function renderTopics(){
     const index = visible.indexOf(g);
     const on = selectedTopics.has(g.key);
     const count = GROUP_COUNTS[g.key];
-    const ids = VOCAB.filter(w=>w.group===g.key).map(w=>w.id);
+    const ids = VOCAB.filter(w=>w.group===g.key && !w.isExample).map(w=>w.id);
     const learned = masteredCount(ids);
     const progress = count ? learned/count : 0;
     const size = blobSizeFor(count, maxCount);
@@ -694,7 +707,7 @@ function renderTopics(){
   });
 }
 function currentPool(){
-  return VOCAB.filter(w=>selectedTopics.has(w.group));
+  return VOCAB.filter(w=>selectedTopics.has(w.group) && !w.isExample);
 }
 function renderPoolHint(){
   const n = currentPool().length;
