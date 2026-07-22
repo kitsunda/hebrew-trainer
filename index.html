@@ -751,7 +751,7 @@ function localStoreKey(){ return `${STORE_PREFIX}${activeProfile||'nastya'}`; }
 const DEFAULT_STATE = {
   boxes:{}, xp:0, streak:0, bestStreak:0, dayStreak:0, lastDate:null, selectedTopics:null,
   lastGoalDate:null, shields:1, achievements:{}, announcedCollectibles:[], totalCorrectEver:0,
-  due:{}, wrongStreaks:{}, mnemonics:{}, vocabVersion:0, verbFamiliesVersion:0
+  due:{}, wrongStreaks:{}, reviewStats:{}, mnemonics:{}, vocabVersion:0, verbFamiliesVersion:0
 };
 function normalizeState(candidate){
   if(!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('Некорректный формат прогресса');
@@ -763,6 +763,7 @@ function normalizeState(candidate){
     announcedCollectibles:Array.isArray(candidate.announcedCollectibles) ? candidate.announcedCollectibles : [],
     due:{...(candidate.due||{})},
     wrongStreaks:{...(candidate.wrongStreaks||{})},
+    reviewStats:{...(candidate.reviewStats||{})},
     mnemonics:{...(candidate.mnemonics||{})}
   };
   if((normalized.verbFamiliesVersion||0)<1){
@@ -856,7 +857,7 @@ async function importProgress(file){
    Основано на исследованиях в "Запоминание слов — что работает": главное не точная
    схема интервалов, а сам факт растянутых во времени повторов (Nakata) + активное
    вспоминание вместо перечитывания (Dunlosky et al. 2013). */
-const SRS_INTERVAL_DAYS = [0,1,3,7,16];
+const SRS_INTERVAL_DAYS = [0,1,3,7,16,35];
 function addDaysStr(dateStr, days){
   const [y,m,dd] = dateStr.split('-').map(Number);
   const d = new Date(y, m-1, dd);
@@ -864,11 +865,37 @@ function addDaysStr(dateStr, days){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function dueOf(id){ return STATE.due[id] || null; }
-function isDueToday(id){ const d = dueOf(id); return !d || d <= todayStr(); }
+function reviewStatsOf(id){
+  return STATE.reviewStats[String(id)] || {attempts:0,correct:0,wrong:0,lapses:0,lastReviewed:null,lastResult:null};
+}
+function wasSeen(id){
+  const stats = reviewStatsOf(id);
+  return boxOf(id)>0 || stats.attempts>0 || !!dueOf(id);
+}
+function isDueToday(id){
+  const d = dueOf(id);
+  return wasSeen(id) && (!d || d <= todayStr());
+}
+function recordReview(id, isCorrect){
+  const key = String(id);
+  const stats = reviewStatsOf(id);
+  STATE.reviewStats[key] = {
+    ...stats,
+    attempts:stats.attempts+1,
+    correct:stats.correct+(isCorrect?1:0),
+    wrong:stats.wrong+(isCorrect?0:1),
+    lapses:stats.lapses+(isCorrect?0:1),
+    lastReviewed:todayStr(),
+    lastResult:isCorrect?'correct':'wrong'
+  };
+}
 function scheduleAfterAnswer(id, isCorrect){
   if(isCorrect){
     const box = boxOf(id);
-    STATE.due[id] = addDaysStr(todayStr(), SRS_INTERVAL_DAYS[box]);
+    const baseInterval = SRS_INTERVAL_DAYS[box] || SRS_INTERVAL_DAYS[SRS_INTERVAL_DAYS.length-1];
+    const lapsePenalty = Math.max(.55, 1-Math.min(.45, reviewStatsOf(id).lapses*.08));
+    const interval = Math.max(1, Math.round(baseInterval*lapsePenalty));
+    STATE.due[id] = addDaysStr(todayStr(), interval);
     STATE.wrongStreaks[id] = 0;
   } else {
     STATE.due[id] = todayStr();
@@ -877,7 +904,7 @@ function scheduleAfterAnswer(id, isCorrect){
 }
 
 function boxOf(id){ return STATE.boxes[id]||0; }
-function setBox(id, val){ STATE.boxes[id] = Math.max(0, Math.min(4,val)); }
+function setBox(id, val){ STATE.boxes[id] = Math.max(0, Math.min(5,val)); }
 
 function todayStr(){
   const d = new Date();
@@ -1139,33 +1166,93 @@ function shuffle(arr){
   for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
   return a;
 }
-/* Настоящий SRS: сначала добираем слова, у которых подошла дата повторения
-   (просроченные раньше только что подошедших), остаток сессии — новыми словами.
-   Точная схема интервалов почти не важна (Nakata) — важен сам факт того, что
-   повторы растянуты по датам, а не идут случайно вперемешку каждый раз. */
-function buildQueue(pool, n){
-  const today = todayStr();
-  const due = pool.filter(w=>isDueToday(w.id));
-  const notDue = pool.filter(w=>!isDueToday(w.id));
-  due.sort((a,b)=>{
-    const da = dueOf(a.id)||today, db = dueOf(b.id)||today;
-    if(da!==db) return da<db?-1:1;
-    return boxOf(a.id)-boxOf(b.id);
+/* Исследовательски обоснованная очередь:
+   1) просроченные повторения раньше новых слов;
+   2) среди повторений раньше идут самые просроченные и трудные;
+   3) за одну сессию добавляется не больше шести новых слов;
+   4) в общей тренировке темы чередуются, а формы одного глагола не стоят рядом.
+   Мы намеренно не показываем будущие карточки раньше срока: если всё сделано,
+   лучше закончить короткую сессию, чем превратить spacing в перечитывание. */
+const MAX_NEW_PER_SESSION = 6;
+function overdueDays(id){
+  const due = dueOf(id);
+  return due ? Math.max(0, daysBetween(due, todayStr())) : 0;
+}
+function difficultyScore(w){
+  const stats = reviewStatsOf(w.id);
+  return overdueDays(w.id)*10 + stats.lapses*4 + stats.wrong*1.5 + (5-boxOf(w.id))*2;
+}
+function compareReviewPriority(a,b){
+  const priority = difficultyScore(b)-difficultyScore(a);
+  if(priority) return priority;
+  const aLast = reviewStatsOf(a.id).lastReviewed||'';
+  const bLast = reviewStatsOf(b.id).lastReviewed||'';
+  if(aLast!==bLast) return aLast<bLast?-1:1;
+  return String(a.id).localeCompare(String(b.id));
+}
+function roundRobinByGroup(cards, limit){
+  const buckets = new Map();
+  shuffle(cards).forEach(card=>{
+    const key = card.group||'other';
+    if(!buckets.has(key)) buckets.set(key,[]);
+    buckets.get(key).push(card);
   });
-  let queue = due.slice(0, n);
-  if(queue.length < n){
-    notDue.sort((a,b)=> (dueOf(a.id)||'') < (dueOf(b.id)||'') ? -1 : 1);
-    queue = queue.concat(notDue.slice(0, n-queue.length));
+  const keys = shuffle([...buckets.keys()]);
+  const result = [];
+  while(result.length<limit && keys.length){
+    for(let i=0;i<keys.length && result.length<limit;){
+      const bucket = buckets.get(keys[i]);
+      const card = bucket.shift();
+      if(card) result.push(card);
+      if(!bucket.length) keys.splice(i,1); else i++;
+    }
   }
-  return shuffle(queue);
+  return result;
+}
+function takeNewCards(cards, limit, topicKey){
+  if(limit<=0) return [];
+  if(topicKey) return shuffle(cards).slice(0,limit);
+  const weekly = cards.filter(w=>w.isWeekly);
+  const other = cards.filter(w=>!w.isWeekly);
+  const weeklyLimit = Math.min(weekly.length, Math.ceil(limit*.6));
+  const selected = roundRobinByGroup(weekly, weeklyLimit);
+  return selected.concat(roundRobinByGroup(other, limit-selected.length));
+}
+function interleaveSelectedCards(cards, topicKey){
+  const remaining = cards.slice();
+  const result = [];
+  while(remaining.length){
+    const previous = result[result.length-1];
+    const previousKey = previous && (previous.verbFamilyId || (!topicKey && previous.group));
+    let pickIndex = remaining.findIndex((card,index)=>{
+      if(index>5) return false;
+      const key = card.verbFamilyId || (!topicKey && card.group);
+      return !previousKey || key!==previousKey;
+    });
+    if(pickIndex<0) pickIndex=0;
+    result.push(remaining.splice(pickIndex,1)[0]);
+  }
+  return result;
+}
+function buildQueue(pool, n, topicKey=null){
+  const reviews = pool.filter(w=>isDueToday(w.id)).sort(compareReviewPriority);
+  const unseen = pool.filter(w=>!wasSeen(w.id));
+  const selectedReviews = reviews.slice(0,n);
+  const newSlots = Math.min(MAX_NEW_PER_SESSION, n-selectedReviews.length);
+  const selectedNew = takeNewCards(unseen,newSlots,topicKey);
+  return interleaveSelectedCards(selectedReviews.concat(selectedNew),topicKey);
 }
 
 function startSession(topicKey=null){
   const pool = currentPool(topicKey);
   if(!pool.length) return;
   const n = selectedLength === 'весь набор' ? pool.length : selectedLength;
-  const queue = buildQueue(pool, n);
-  session = { queue, pool, topicKey, i:0, mode:selectedMode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], fullDeck:selectedLength==='весь набор' };
+  const queue = buildQueue(pool, n, topicKey);
+  if(!queue.length){
+    showToast(topicKey ? 'В этой теме на сегодня всё повторено' : 'На сегодня всё повторено');
+    return;
+  }
+  session = { queue, pool, topicKey, i:0, mode:selectedMode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], requeues:{}, fullDeck:selectedLength==='весь набор' };
   document.getElementById('setup').style.display = 'none';
   document.getElementById('summary').style.display = 'none';
   document.getElementById('session').style.display = 'flex';
@@ -1203,7 +1290,8 @@ function afterAnswer(isCorrect, w, xpGain){
   stage.classList.add(isCorrect?'correct':'wrong');
   if(isCorrect){
     STATE.streak++; STATE.bestStreak = Math.max(STATE.bestStreak, STATE.streak);
-    setBox(w.id, boxOf(w.id)+1); session.correct++;
+    setBox(w.id, boxOf(w.id)+1); recordReview(w.id,true); session.correct++;
+    session.missed = session.missed.filter(card=>String(card.id)!==String(w.id));
     scheduleAfterAnswer(w.id, true);
     const before = levelInfo(STATE.xp);
     STATE.xp += xpGain;
@@ -1214,8 +1302,16 @@ function afterAnswer(isCorrect, w, xpGain){
     if(hour<5) unlockFlag('night_owl');
   } else {
     STATE.streak = 0; setBox(w.id, Math.max(0, boxOf(w.id)-1));
+    recordReview(w.id,false);
     scheduleAfterAnswer(w.id, false);
-    session.wrong++; session.missed.push(w);
+    session.wrong++;
+    if(!session.missed.some(card=>String(card.id)===String(w.id))) session.missed.push(w);
+    const key = String(w.id);
+    if((session.requeues[key]||0)<1){
+      session.requeues[key] = (session.requeues[key]||0)+1;
+      const returnAt = Math.min(session.queue.length, session.i+4);
+      session.queue.splice(returnAt,0,w);
+    }
   }
   saveState(); renderStats();
   checkGarden();
@@ -1431,7 +1527,7 @@ function finishSession(){
   if(session.missed.length){
     document.getElementById('retryMissed').addEventListener('click', ()=>{
       const missed = session.missed;
-      session = { queue: missed, pool: session.pool, i:0, mode: session.mode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], fullDeck:false };
+      session = { queue: missed, pool: session.pool, topicKey:session.topicKey, i:0, mode:session.mode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], requeues:{}, fullDeck:false };
       s.style.display='none';
       document.getElementById('session').style.display='flex';
       document.body.classList.add('session-active');
