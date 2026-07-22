@@ -137,7 +137,7 @@ header.top h1{
   width:100%;
   min-height:52px; padding:var(--space-3) var(--space-5); text-align:left;
   transition:transform .2s var(--ease-out), filter .25s ease, opacity .25s ease;
-  opacity:calc(.35 + var(--topic-progress, 0) * .55);
+  opacity:calc(.78 + var(--topic-progress, 0) * .22);
   filter:saturate(calc(.72 + var(--topic-progress, 0) * .75));
   animation:topicIn .55s var(--topic-delay, 0s) var(--ease-out) both;
 }
@@ -147,13 +147,13 @@ header.top h1{
   width:var(--blob-size); height:calc(var(--blob-size) * .74);
   border-radius:var(--blob-radius, 45% 55% 60% 40% / 55% 45% 55% 45%);
   background:var(--blob-background, radial-gradient(circle at 38% 32%, var(--blob-color) 0%, var(--blob-color) 42%, transparent 74%));
-  filter:blur(12px);
-  opacity:calc(.42 + var(--topic-progress, 0) * .5);
+  filter:blur(8px);
+  opacity:calc(.82 + var(--topic-progress, 0) * .18);
   transition:transform .25s var(--ease-out), filter .25s ease, opacity .25s ease;
   animation:cloudDrift var(--topic-drift, 8s) ease-in-out var(--topic-delay, 0s) infinite alternate;
 }
-.topic-blob.on{opacity:calc(.46 + var(--topic-progress, 0) * .54);}
-.topic-blob:not(.on){opacity:.18; filter:saturate(.55);}
+.topic-blob.on{opacity:calc(.88 + var(--topic-progress, 0) * .12);}
+.topic-blob:not(.on){opacity:.72; filter:saturate(.9);}
 .topic-blob:hover,.topic-blob:focus-visible{transform:translate(2px,-2px);}
 .topic-blob:hover::before,.topic-blob:focus-visible::before{transform:translateY(-50%) scale(1.045); filter:blur(10px); opacity:1;}
 .topic-blob:active{transform:translate(2px,-1px) scale(.985);}
@@ -680,7 +680,7 @@ function renderTopics(){
     const progress = count ? learned/count : 0;
     const size = blobSizeFor(count, maxCount);
     const color = blobColorFor(g.key);
-    const finalOpacity = on ? .46 + progress*.54 : .18;
+    const finalOpacity = on ? .88 + progress*.12 : .72;
     return `<button class="topic-blob ${on?'on':''}" data-key="${g.key}" style="--blob-size:${size}px; --blob-color:${color}; --topic-progress:${progress.toFixed(3)}; --topic-final-opacity:${finalOpacity.toFixed(3)}; --topic-delay:${(index*.045).toFixed(2)}s; --topic-drift:${7+(index%4)}s; --blob-radius:${blobRadii[index%blobRadii.length]}; --blob-background:${blobBackgrounds[index%blobBackgrounds.length]}">
       <span class="topic-name">${g.label}</span>
       <span class="topic-meta">${learned} из ${count}</span>
