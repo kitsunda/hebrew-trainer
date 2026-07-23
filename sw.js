@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'hebrew-trainer-v14';
+const CACHE_VERSION = 'hebrew-trainer-v16';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './bootstrap.js',
   './app.js',
   './manifest.webmanifest',
+  './icons/achievement-flowers-transparent.png',
   './vendor/supabase-2.110.8.min.js',
   './icons/icon-192.png',
   './icons/icon-512.png',

@@ -429,8 +429,8 @@ body.session-active .stage{min-height:0;overflow:visible;}
 .showcase-item.locked .showcase-icon{width:42px;height:50px; background-image:none; background-color:transparent; border-radius:0;}
 .showcase-item.locked .showcase-icon svg{opacity:.35;}
 .showcase-icon{
-  background-image:url('icons/achievement-flowers.webp'); background-size:1136.364% 602.41%; background-repeat:no-repeat; background-position:var(--flower-x) var(--flower-y);
-  border-radius:0; overflow:visible; mix-blend-mode:darken;
+  background-image:url('icons/achievement-flowers-transparent.png'); background-size:1136.364% 602.41%; background-repeat:no-repeat; background-position:var(--flower-x) var(--flower-y);
+  border-radius:0; overflow:visible; mix-blend-mode:normal;
   -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 0 84%,rgba(0,0,0,.72) 91%,transparent 100%);
   mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 0 84%,rgba(0,0,0,.72) 91%,transparent 100%);
 }
