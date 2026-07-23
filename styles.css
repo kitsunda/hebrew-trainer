@@ -209,6 +209,7 @@ header.top h1{
 .topic-blob.weekly-topic:hover::before,.topic-blob.weekly-topic:focus-visible::before{
   transform:scale(1.045);
 }
+.weekly-topic .topic-name,.weekly-topic .topic-meta{transform:translateX(-18px);}
 .weekly-topic .topic-name{font-size:14px; letter-spacing:.045em;}
 .topic-blob.launching{transform:scale(1.025);pointer-events:none;}
 .topic-blob.topic-center.launching,.topic-blob.weekly-topic.launching{transform:translateX(-50%) scale(1.025);}
