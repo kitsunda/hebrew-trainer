@@ -324,8 +324,13 @@ body.session-active .stage{min-height:0;overflow:visible;}
 .hebrew-word{font-weight:520;text-align:center;line-height:1.25;white-space:normal;word-break:break-word;max-width:100%;max-height:180px;opacity:1;overflow:hidden;transition:opacity .18s var(--ease-out),transform .18s var(--ease-out),max-height .22s var(--ease-out);}
 .flip-zone.revealed .hebrew-word{opacity:1;max-height:180px;transform:translateY(0);}
 .reverse-front{font-family:var(--font-sans);padding:0 16px;box-sizing:border-box;}
+.flip-zone.reverse-card.revealed .reverse-front{opacity:0;max-height:0;transform:translateY(-8px);}
 .back-hebrew{font-weight:520;text-align:center;line-height:1.25;max-width:100%;padding:var(--space-2) 12px 0;box-sizing:border-box;overflow-wrap:anywhere;}
-.translit{font-size:14px; color:var(--color-text-muted); font-weight:500; margin-top:var(--space-2);}
+.translit{
+  width:100%;max-width:360px;box-sizing:border-box;padding:0 14px;
+  font-size:clamp(12px,3.6vw,15px);line-height:1.4;text-align:center;overflow-wrap:anywhere;
+  color:var(--color-text-muted);font-weight:500;margin-top:var(--space-2);
+}
 .russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; width:100%; max-width:100%; box-sizing:border-box; margin-top:var(--space-4); padding:var(--space-3) 8px 0;}
 .flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:10px;}
 
@@ -564,6 +569,7 @@ body.session-active .stage{min-height:0;overflow:visible;}
 <script src="lenya-vocab.js"></script>
 <script src="verb-families.js"></script>
 <script src="doc-imports.js"></script>
+<script src="transcriptions.js"></script>
 <script>
   if (localStorage.getItem('hebrewTrainer_activeProfile') === 'lenya') {
     window.VOCAB = window.LENYA_VOCAB;
@@ -787,6 +793,11 @@ VERB_FAMILIES.forEach(family=>{
   });
 });
 VOCAB.push(...VERB_CARDS);
+const TRANSCRIPTIONS = window.HEBREW_TRANSCRIPTIONS || {};
+VOCAB.forEach(word=>{
+  const transcription = String(word.t || TRANSCRIPTIONS[String(word.h || '').trim()] || '').trim();
+  word.t = transcription.replace(/[hH]/g, match=>match==='H'?'Х':'х');
+});
 
 /* Контекст усиливает запоминание почти так же сильно, как активное вспоминание
    (Broek et al., 2022) — при повторе показываем фразу/предложение, где то же
@@ -1469,7 +1480,7 @@ function renderFlash(stage, w, groupLabel){
           <div class="card-back" id="cardBack" aria-hidden="true">
             ${reverse? `<div class="back-hebrew font-hebrew" style="font-size:${hebrewFontSize(w.h)}">${w.h}</div>` : ''}
             ${w.t? `<div class="translit">${w.t}</div>` : ''}
-            ${reverse ? '' : `<div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>`}
+            <div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>
             ${contextLineHtml(w)}
             ${mnemonicHintHtml(w)}
           </div>

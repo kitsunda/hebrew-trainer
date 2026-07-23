@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'hebrew-trainer-v6';
+const CACHE_VERSION = 'hebrew-trainer-v7';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './lenya-vocab.js',
   './verb-families.js',
   './doc-imports.js',
+  './transcriptions.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
