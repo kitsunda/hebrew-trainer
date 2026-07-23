@@ -415,17 +415,22 @@ body.session-active .stage{min-height:0;overflow:visible;}
 .showcase-scroll::-webkit-scrollbar{display:none;}
 .showcase-item{
   display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; flex:none;
-  width:68px; min-height:68px; background:transparent; border-radius:0; padding:2px 0;
+  width:76px; min-height:84px; background:transparent; border-radius:0; padding:0;
   transition:opacity .25s ease, transform .25s var(--ease-out), filter .25s ease;
 }
 .showcase-item.locked{opacity:.42; filter:grayscale(.65); transform:scale(.9);}
 .showcase-item.unlocked{opacity:1; transform:scale(1.05);}
 .showcase-item.just-unlocked{animation:bloomIn .75s var(--ease-out) both;}
 .showcase-scroll.has-new-flower{animation:gardenReveal .65s var(--ease-out) both;}
-.showcase-icon{width:54px;height:62px; transition:transform .5s var(--ease-out), filter .5s ease;}
+.showcase-icon{width:66px;height:88px; transition:transform .5s var(--ease-out), filter .5s ease;}
 .showcase-item.locked .showcase-icon{width:42px;height:50px; background-image:none; background-color:transparent; border-radius:0;}
 .showcase-item.locked .showcase-icon svg{opacity:.35;}
-.showcase-icon{background-image:url('icons/achievement-flowers.webp'); background-size:1000% 500%; background-repeat:no-repeat; background-position:var(--flower-x) var(--flower-y); border-radius:12px; overflow:hidden;}
+.showcase-icon{
+  background-image:url('icons/achievement-flowers.webp'); background-size:1136.364% 602.41%; background-repeat:no-repeat; background-position:var(--flower-x) var(--flower-y);
+  border-radius:0; overflow:visible; mix-blend-mode:darken;
+  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 0 84%,rgba(0,0,0,.72) 91%,transparent 100%);
+  mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 0 84%,rgba(0,0,0,.72) 91%,transparent 100%);
+}
 .showcase-icon svg{width:100%;height:100%;display:block;}
 .showcase-req{font-size:10px; color:var(--color-text-muted); font-weight:500; font-variant-numeric:tabular-nums; font-family:var(--font-mono);}
 .garden-next{display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-3); color:var(--color-text-muted); font-size:12px; line-height:1.45;}

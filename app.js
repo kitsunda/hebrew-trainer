@@ -756,8 +756,12 @@ function renderGarden(justUnlocked=[]){
   grid.innerHTML = unlockedFlowers.map(f=>{
     const col = f.imageIndex % 10;
     const row = Math.floor(f.imageIndex / 10);
+    /* В исходном атласе внутри каждой ячейки есть номер и подпись.
+       Показываем только центральную область с самим цветком. */
+    const flowerX = ((col+.06)/(10-.88))*100;
+    const flowerY = ((row+.09)/(5-.83))*100;
     return `<div class="showcase-item unlocked ${justUnlocked.includes(f.id)?'just-unlocked':''}" title="${f.desc}">
-      <div class="showcase-icon" style="--flower-x:${(col*11.111).toFixed(3)}%;--flower-y:${(row*25).toFixed(3)}%;"></div>
+      <div class="showcase-icon" style="--flower-x:${flowerX.toFixed(3)}%;--flower-y:${flowerY.toFixed(3)}%;"></div>
     </div>`;
   }).join('');
   grid.classList.toggle('has-new-flower', justUnlocked.length>0);
