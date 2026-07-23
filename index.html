@@ -320,7 +320,7 @@ body.session-active .stage{min-height:0;overflow:visible;}
 .flash-focus .topic-tag{position:absolute;top:48px;left:0;right:0;margin:0;text-align:center;}
 .flash-word-stack{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .card-back{opacity:0;max-height:0;overflow:hidden;transform:translateY(8px);transition:opacity .22s var(--ease-out),transform .22s var(--ease-out),max-height .28s var(--ease-out);width:100%;max-width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;}
-.flip-zone.revealed .card-back{opacity:1;max-height:340px;transform:translateY(0);}
+.flip-zone.revealed .card-back{opacity:1;max-height:520px;transform:translateY(0);}
 .hebrew-word{font-weight:520;text-align:center;line-height:1.25;white-space:normal;word-break:break-word;max-width:100%;max-height:180px;opacity:1;overflow:hidden;transition:opacity .18s var(--ease-out),transform .18s var(--ease-out),max-height .22s var(--ease-out);}
 .flip-zone.revealed .hebrew-word{opacity:1;max-height:180px;transform:translateY(0);}
 .reverse-front{font-family:var(--font-sans);padding:0 16px;box-sizing:border-box;}
@@ -333,6 +333,14 @@ body.session-active .stage{min-height:0;overflow:visible;}
 }
 .russian-word{font-size:22px; font-weight:520; font-family:var(--font-sans); text-align:center; line-height:1.3; white-space:normal; word-break:break-word; width:100%; max-width:100%; box-sizing:border-box; margin-top:var(--space-4); padding:var(--space-3) 8px 0;}
 .flip-hint{font-size:12px; color:var(--color-text-faint); font-weight:500; margin-top:10px;}
+.report-card-error{
+  margin-top:var(--space-4);padding:10px 12px;border:0;background:none;
+  color:var(--color-text-muted);font-family:var(--font-sans);font-size:12px;
+  line-height:1.3;text-decoration:underline;text-decoration-thickness:1px;
+  text-underline-offset:3px;cursor:pointer;
+}
+.report-card-error:hover,.report-card-error:focus-visible{color:var(--color-text);}
+.report-card-error:disabled{cursor:default;text-decoration:none;opacity:.72;}
 
 .know-row{display:flex; align-items:center; justify-content:center; gap:var(--space-5); margin-top:auto; padding-top:var(--space-10); width:100%;}
 .know-btn{
@@ -1465,6 +1473,96 @@ function attachMnemonicSave(w){
     if(val){ STATE.mnemonics[w.id] = val; saveState(); renderQuestion(); }
   });
 }
+const CARD_FEEDBACK_QUEUE_KEY = 'hebrewTrainer_pendingCardFeedback';
+function cardFeedbackSignature(w){
+  const source = `${w.h}|${w.t}|${w.r}`;
+  let hash = 2166136261;
+  for(let i=0;i<source.length;i++){
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash>>>0).toString(36);
+}
+function cardFeedbackStorageKey(w){
+  return `hebrewTrainer_cardFeedback:${activeProfile}:${w.id}:${cardFeedbackSignature(w)}`;
+}
+function pendingCardFeedback(){
+  try{
+    const parsed = JSON.parse(localStorage.getItem(CARD_FEEDBACK_QUEUE_KEY)||'[]');
+    return Array.isArray(parsed) ? parsed : [];
+  }catch(error){ return []; }
+}
+function savePendingCardFeedback(items){
+  localStorage.setItem(CARD_FEEDBACK_QUEUE_KEY, JSON.stringify(items));
+}
+async function submitCardFeedback(report){
+  const {error} = await supabaseClient.from('card_feedback').insert(report);
+  if(error && error.code!=='23505') throw error;
+}
+async function flushPendingCardFeedback(){
+  if(!navigator.onLine) return;
+  const queued = pendingCardFeedback();
+  if(!queued.length) return;
+  const remaining = [];
+  for(const report of queued){
+    try{ await submitCardFeedback(report); }
+    catch(error){ remaining.push(report); }
+  }
+  savePendingCardFeedback(remaining);
+}
+window.addEventListener('online', flushPendingCardFeedback);
+function attachCardFeedback(w, reverse, groupLabel){
+  const button = document.getElementById('reportCardError');
+  if(!button) return;
+  const storageKey = cardFeedbackStorageKey(w);
+  try{
+    if(localStorage.getItem(storageKey)==='1'){
+      button.textContent = 'Отправлено на проверку';
+      button.disabled = true;
+      return;
+    }
+  }catch(error){}
+  button.addEventListener('click', async event=>{
+    event.stopPropagation();
+    button.disabled = true;
+    button.textContent = 'Отправляю…';
+    const context = w.ctx ? VOCAB[w.ctx] : null;
+    const report = {
+      profile_id:activeProfile,
+      card_id:String(w.id),
+      card_data:{
+        hebrew:w.h,
+        transcription:w.t,
+        translation:w.r,
+        example:context ? {hebrew:context.h, transcription:context.t||'', translation:context.r} : null,
+        group:w.group,
+        groupLabel,
+        formLabel:w.formLabel||null,
+        direction:reverse?'russian_to_hebrew':'hebrew_to_russian',
+        sourceHebrew:w.source_h||null,
+        sourceTranscription:w.source_t||null,
+        sourceTranslation:w.source_r||null
+      },
+      page_url:`${location.origin}${location.pathname}`
+    };
+    try{
+      await submitCardFeedback(report);
+      try{ localStorage.setItem(storageKey,'1'); }catch(error){}
+      button.textContent = 'Отправлено на проверку';
+      queueToast('Спасибо — проверю эту карточку', 'achv');
+    }catch(error){
+      const queued = pendingCardFeedback();
+      if(!queued.some(item=>item.profile_id===report.profile_id && item.card_id===report.card_id)){
+        queued.push(report);
+        savePendingCardFeedback(queued);
+      }
+      try{ localStorage.setItem(storageKey,'1'); }catch(storageError){}
+      button.textContent = 'Отправим, когда появится интернет';
+      queueToast('Сохранили — отправим при подключении', 'achv');
+    }
+  });
+  flushPendingCardFeedback();
+}
 function renderFlash(stage, w, groupLabel){
   const reverse = isLearnedForReverse(w);
   const frontHtml = reverse
@@ -1483,6 +1581,7 @@ function renderFlash(stage, w, groupLabel){
             <div class="russian-word" style="font-size:${russianFontSize(w.r)}">${w.r}</div>
             ${contextLineHtml(w)}
             ${mnemonicHintHtml(w)}
+            <button class="report-card-error" id="reportCardError" type="button">Кажется, здесь ошибка</button>
           </div>
         </div>
       </div>
@@ -1509,6 +1608,7 @@ function renderFlash(stage, w, groupLabel){
   document.getElementById('btnYes').addEventListener('click', (e)=>{ e.stopPropagation(); afterAnswer(true, w, 3); });
   document.getElementById('btnNo').addEventListener('click', (e)=>{ e.stopPropagation(); afterAnswer(false, w, 0); });
   attachMnemonicSave(w);
+  attachCardFeedback(w, reverse, groupLabel);
 }
 
 /* multiple choice */
