@@ -113,6 +113,46 @@ function validateVerbs(profile, families) {
   });
 }
 
+function normalizeHebrew(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0591-\u05C7]/g, '')
+    .replace(/[^א-ת0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function validateWeeklyLessons(profile, base, imports, families, lessons) {
+  const cards = [...(base || []), ...(imports || [])];
+  const cardKeys = new Set(cards.map(card => normalizeHebrew(card.h)));
+  const verbKeys = new Set((families || []).map(family => normalizeHebrew(family.infinitive)));
+  const weeklyKeys = new Set();
+
+  if (!Array.isArray(lessons) || !lessons.length) {
+    fail(`${profile}: недельный набор пуст`);
+    return;
+  }
+
+  lessons.forEach((lesson, lessonIndex) => {
+    const label = `${profile}, недельное занятие ${lessonIndex + 1}`;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(lesson.date || ''))) {
+      fail(`${label}: дата должна быть в формате YYYY-MM-DD`);
+    }
+    for (const word of lesson.words || []) {
+      const key = normalizeHebrew(word);
+      if (!cardKeys.has(key)) fail(`${label}: карточка «${word}» не найдена в словаре`);
+      if (weeklyKeys.has(`word:${key}`)) fail(`${label}: повтор недельной карточки «${word}»`);
+      weeklyKeys.add(`word:${key}`);
+    }
+    for (const verb of lesson.verbs || []) {
+      const key = normalizeHebrew(verb);
+      if (!verbKeys.has(key)) fail(`${label}: семья глагола «${verb}» не найдена`);
+      if (weeklyKeys.has(`verb:${key}`)) fail(`${label}: повтор недельного глагола «${verb}»`);
+      weeklyKeys.add(`verb:${key}`);
+    }
+  });
+}
+
 validateWords(
   'Настя',
   context.window.VOCAB,
@@ -125,6 +165,20 @@ validateWords(
 );
 validateVerbs('Настя', context.window.NASTYA_VERB_FAMILIES);
 validateVerbs('Лёня', context.window.LENYA_VERB_FAMILIES);
+validateWeeklyLessons(
+  'Настя',
+  context.window.VOCAB,
+  context.window.NASTYA_DOC_IMPORTS,
+  context.window.NASTYA_VERB_FAMILIES,
+  context.window.NASTYA_WEEKLY_LESSONS
+);
+validateWeeklyLessons(
+  'Лёня',
+  context.window.LENYA_VOCAB,
+  context.window.LENYA_DOC_IMPORTS,
+  context.window.LENYA_VERB_FAMILIES,
+  context.window.LENYA_WEEKLY_LESSONS
+);
 
 if (failures.length) {
   console.error(`Проверка не пройдена: ${failures.length} ошибок`);

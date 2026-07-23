@@ -27,15 +27,39 @@
     loadScript('vendor/supabase-2.110.8.min.js'),
     ...dataAssets.map(loadScript)
   ]).then(() => {
+    function normalizeHebrew(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0591-\u05C7]/g, '')
+        .replace(/[^א-ת0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function applyWeeklyLessons(lessons) {
+      const weeklyWords = new Set();
+      const weeklyVerbs = new Set();
+      (lessons || []).forEach(lesson => {
+        (lesson.words || []).forEach(word => weeklyWords.add(normalizeHebrew(word)));
+        (lesson.verbs || []).forEach(verb => weeklyVerbs.add(normalizeHebrew(verb)));
+      });
+      window.VOCAB.forEach(word => {
+        word.isWeekly = weeklyWords.has(normalizeHebrew(word.h));
+      });
+      (window.VERB_FAMILIES || []).forEach(family => {
+        family.isWeekly = weeklyVerbs.has(normalizeHebrew(family.infinitive));
+      });
+    }
+
     if (profile === 'lenya') {
       window.VOCAB = window.LENYA_VOCAB;
       window.VERB_FAMILIES = window.LENYA_VERB_FAMILIES;
-      (window.LENYA_DOC_IMPORTS || []).forEach(word => { word.isWeekly = true; });
       window.VOCAB.push(...(window.LENYA_DOC_IMPORTS || []));
+      applyWeeklyLessons(window.LENYA_WEEKLY_LESSONS);
     } else {
       window.VERB_FAMILIES = window.NASTYA_VERB_FAMILIES;
-      (window.NASTYA_DOC_IMPORTS || []).forEach(word => { word.isWeekly = true; });
       window.VOCAB.push(...(window.NASTYA_DOC_IMPORTS || []));
+      applyWeeklyLessons(window.NASTYA_WEEKLY_LESSONS);
     }
     return loadScript('app.js');
   }).catch(error => {

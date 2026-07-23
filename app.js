@@ -71,9 +71,10 @@ function groupOf(topic, word){
   if(/переезд|переезж|дорог|машин|автобус|поезд|самол|такси|улиц|город|пляж|путешеств|гулять|вернут|возвращ|приех|приход|направлен|снаружи|заграниц|נסיעה|אוטובוס|רכבת|מכונית|עיר|חוף|לחזור|להחזיר|לעבור דירה|חוץ לארץ/.test(all)) return 'transport';
   if(/грамматик|предлог|местоим|суффикс|связк|пассив|степен|спряжен|конструкц|модаль|союз|потому что|так как|кроме|слишком|чем\.\.|עברית דקדוק|מפני ש|חוץ מ|מאשר/.test(all)) return 'grammar';
   if(looksLikeReadyPhrase(word) || /^фразы$/.test(t)) return 'phrases';
-  // У Лёни пока нет исходных меток частей речи, поэтому сохраняем его
-  // прежнее распределение до отдельной ручной чистки словаря.
-  if(lenyaSource && (hebrewInfinitive || russianInfinitive)) return 'verbs';
+  // В словаре Лёни русское слово вроде «есть» или «переехать» может входить
+  // в перевод целой фразы. Поэтому глаголом считаем только одиночный
+  // ивритский инфинитив, подтверждённый русским инфинитивом.
+  if(lenyaSource && hebrewInfinitive && russianInfinitive) return 'verbs';
   return 'everyday';
 }
 
@@ -200,6 +201,7 @@ VERB_FAMILIES.forEach(family=>{
       group:'verbs',
       isExample:false,
       isLegacyVerb:false,
+      isWeekly:Boolean(family.isWeekly),
       verbFamilyId:family.id,
       verbForm:form.key,
       formLabel:form.label,
