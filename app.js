@@ -653,11 +653,12 @@ function renderTopics(){
   const weeklyIds = LEARNING_VOCAB.filter(w=>w.isWeekly).map(w=>w.id);
   const weeklyCount = weeklyIds.length;
   const weeklyLearned = masteredCount(weeklyIds);
+  /* Если недельных слов нет, не оставляем наверху пустое место под их облако. */
+  const firstTopicTop = weeklyCount ? 230 : 18;
   const topicLayouts = [
-    {top:230,side:'left'}, {top:420,side:'right'}, {top:610,side:'left'}, {top:800,side:'right'},
-    {top:990,side:'left'}, {top:1180,side:'right'}, {top:1370,side:'left'}, {top:1560,side:'right'},
-    {top:1750,side:'left'}, {top:1940,side:'right'}
-  ];
+    {side:'left'}, {side:'right'}, {side:'left'}, {side:'right'}, {side:'left'},
+    {side:'right'}, {side:'left'}, {side:'right'}, {side:'left'}, {side:'right'}
+  ].map((layout,index)=>({...layout,top:firstTopicTop+(index*190)}));
   const weeklyStyle = '--blob-top:42px; --blob-size:260px; --blob-color:var(--color-lilac); --topic-progress:'+(weeklyCount ? (weeklyLearned/weeklyCount).toFixed(3) : '0')+'; --topic-final-opacity:1; --topic-delay:0s; --topic-drift:8s; --blob-transform:rotate(-4deg) scale(1.03,.92); --blob-radius:58% 42% 52% 48% / 46% 57% 43% 54%; --blob-background:radial-gradient(ellipse 72% 76% at 38% 42%, var(--blob-color) 0 23%, color-mix(in srgb,var(--blob-color) 74%,transparent) 46%, transparent 100%), radial-gradient(ellipse 52% 56% at 72% 62%, color-mix(in srgb,var(--blob-color) 56%,transparent) 0 18%, transparent 100%)';
   const weeklyCloud = weeklyCount ? `<button class="topic-blob weekly-topic topic-center on" data-key="weekly" aria-label="Начать тему «Слова этой недели» — ${weeklyCount} ${pluralWords(weeklyCount)}" style="${weeklyStyle}">
     <span class="topic-name">Слова этой недели</span>
