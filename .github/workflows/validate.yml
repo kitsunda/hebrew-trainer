@@ -1,0 +1,22 @@
+name: Проверка приложения
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачать проект
+        uses: actions/checkout@v4
+      - name: Подключить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Проверить код и словари
+        run: npm test

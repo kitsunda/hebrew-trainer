@@ -1,37 +1,21 @@
-const CACHE_VERSION = 'hebrew-trainer-v8';
+const CACHE_VERSION = 'hebrew-trainer-v9';
 const APP_SHELL = [
   './',
   './index.html',
+  './styles.css',
+  './bootstrap.js',
+  './app.js',
   './manifest.webmanifest',
-  './vocab.js',
-  './lenya-vocab.js',
-  './verb-families.js',
-  './doc-imports.js',
-  './transcriptions.js',
+  './vendor/supabase-2.110.8.min.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/achievement-flowers.png',
-  './icons/launch-1125x2436.png',
-  './icons/launch-1170x2532.png',
-  './icons/launch-1179x2556.png',
-  './icons/launch-1206x2622.png',
-  './icons/launch-1242x2688.png',
-  './icons/launch-1290x2796.png',
-  './icons/launch-1320x2868.png'
-];
-const OPTIONAL_ASSETS = [
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+  './icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event=>{
   event.waitUntil((async()=>{
     const cache = await caches.open(CACHE_VERSION);
     await cache.addAll(APP_SHELL);
-    await Promise.allSettled(OPTIONAL_ASSETS.map(async url=>{
-      const response = await fetch(url, {mode:'cors'});
-      if(response.ok) await cache.put(url, response);
-    }));
     await self.skipWaiting();
   })());
 });
@@ -73,7 +57,19 @@ self.addEventListener('fetch', event=>{
     event.respondWith(networkFirst(request));
     return;
   }
-  if(url.origin===self.location.origin || url.hostname==='cdn.jsdelivr.net'){
+  if(url.origin===self.location.origin){
     event.respondWith(cacheFirstAndRefresh(request));
   }
+});
+
+self.addEventListener('message', event=>{
+  if(event.data?.type!=='CACHE_URLS' || !Array.isArray(event.data.urls)) return;
+  event.waitUntil((async()=>{
+    const cache = await caches.open(CACHE_VERSION);
+    await Promise.allSettled(event.data.urls.map(async path=>{
+      const url = new URL(path,self.registration.scope).href;
+      const response = await fetch(url);
+      if(response.ok) await cache.put(url,response);
+    }));
+  })());
 });

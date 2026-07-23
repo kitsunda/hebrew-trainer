@@ -1,0 +1,7 @@
+{
+  "name": "hebrew-trainer",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/validate-project.mjs"
+  }
+}
