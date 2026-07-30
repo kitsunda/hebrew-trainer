@@ -205,6 +205,8 @@ VERB_FAMILIES.forEach(family=>{
       verbFamilyId:family.id,
       verbForm:form.key,
       formLabel:form.label,
+      example:family.example || null,
+      source:family.source || null,
     });
   });
 });
