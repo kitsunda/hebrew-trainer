@@ -81,6 +81,14 @@ function validateWords(profile, base, imports) {
     exactCards.add(cardKey);
     const transcription = String(word.t || transcriptions[String(word.h).trim()] || '').trim();
     if (!transcription) fail(`${label}: нет транскрипции для «${word.h}»`);
+    if (word.example) {
+      if (typeof word.example.h !== 'string' || !word.example.h.trim()) {
+        fail(`${label}: пустой иврит в примере`);
+      }
+      if (typeof word.example.r !== 'string' || !word.example.r.trim()) {
+        fail(`${label}: пустой перевод примера`);
+      }
+    }
   });
 
   (imports || []).forEach((word, index) => {

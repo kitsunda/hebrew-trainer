@@ -962,6 +962,9 @@ function escapeHtml(value){
   return node.innerHTML;
 }
 function contextLineHtml(w){
+  if(w.example?.h){
+    return `<div class="context-line"><span class="font-hebrew">${escapeHtml(w.example.h)}</span><span class="context-sep">—</span>${escapeHtml(w.example.r||'')}</div>`;
+  }
   if(!w.ctx) return '';
   const c = VOCAB[w.ctx];
   if(!c) return '';
@@ -1046,7 +1049,9 @@ function attachCardFeedback(w, reverse, groupLabel){
     event.stopPropagation();
     button.disabled = true;
     button.textContent = 'Отправляю…';
-    const context = w.ctx ? VOCAB[w.ctx] : null;
+    const context = w.example?.h
+      ? {h:w.example.h,t:w.example.t||'',r:w.example.r||''}
+      : (w.ctx ? VOCAB[w.ctx] : null);
     const report = {
       profile_id:activeProfile,
       card_id:String(w.id),
