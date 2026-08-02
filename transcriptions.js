@@ -5,3 +5,10 @@ Object.assign(window.HEBREW_TRANSCRIPTIONS,{
   'הרכיב':'хирки́в',
   'מרכיב':'марки́в'
 });
+Object.assign(window.HEBREW_TRANSCRIPTIONS,{
+  'להירגע':'лехираге́а',
+  'נרגע':'нирга́',
+  'לבאס':'леваэ́с',
+  'ביאס':'бие́с',
+  'מבאס':'меваэ́с'
+});

@@ -6,3 +6,7 @@ window.LENYA_VERB_FAMILIES.push(
   {id:'A:אסף',meaning:'собирать, забирать',infinitive:'לאסוף',past:'אסף',present:'אוסף'},
   {id:'F:הרכיב',meaning:'собирать из деталей',infinitive:'להרכיב',past:'הרכיב',present:'מרכיב'}
 );
+window.NASTYA_VERB_FAMILIES.push(
+  {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
+  {id:'C:באס',meaning:'расстраивать, огорчать',infinitive:'לבאס',past:'ביאס',present:'מבאס',example:{h:'זה ממש מבאס אותי',r:'это меня очень расстраивает'},source:'Настя перек 2, 02.08.2026'}
+);
