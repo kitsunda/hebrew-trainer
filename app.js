@@ -692,7 +692,12 @@ function renderTopics(){
   el.querySelectorAll('.topic-blob').forEach(chip=>{
     chip.addEventListener('click', ()=>{
       chip.classList.add('launching');
-      setTimeout(()=>startSession(chip.dataset.key), reduceMotion ? 0 : 160);
+      setTimeout(()=>{
+        const started = startSession(chip.dataset.key);
+        /* Если сегодня нечего запускать, не оставляем кнопку в состоянии
+           «нажато» — иначе из-за pointer-events она кажется сломанной. */
+        if(!started) chip.classList.remove('launching');
+      }, reduceMotion ? 0 : 160);
     });
   });
 }
@@ -879,12 +884,15 @@ function buildQueue(pool, n, topicKey=null){
 
 function startSession(topicKey=null){
   const pool = currentPool(topicKey);
-  if(!pool.length) return;
+  if(!pool.length){
+    showToast(topicKey==='weekly' ? 'Новых слов этой недели пока нет' : 'В этой теме пока нет слов');
+    return false;
+  }
   const n = selectedLength === 'весь набор' ? pool.length : selectedLength;
   const queue = buildQueue(pool, n, topicKey);
   if(!queue.length){
     showToast(topicKey ? 'В этой теме на сегодня всё повторено' : 'На сегодня всё повторено');
-    return;
+    return false;
   }
   session = { queue, pool, topicKey, i:0, mode:selectedMode, correct:0, wrong:0, xpStart:STATE.xp, missed:[], requeues:{}, fullDeck:selectedLength==='весь набор' };
   document.getElementById('setup').style.display = 'none';
@@ -892,6 +900,7 @@ function startSession(topicKey=null){
   document.getElementById('session').style.display = 'flex';
   document.body.classList.add('session-active');
   renderQuestion();
+  return true;
 }
 document.getElementById('startBtn').addEventListener('click', ()=>startSession());
 document.getElementById('exitBtn').addEventListener('click', endSession);

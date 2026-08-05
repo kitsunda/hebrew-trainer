@@ -172,7 +172,7 @@ header.top h1{
 .topic-color-blob.topic-color-right{left:auto;right:36px;}
 .topic-color-blob.topic-color-center{left:50%;transform:translateX(-50%) var(--blob-transform,none);}
 .topic-blob{
-  position:absolute; z-index:1; border:none; cursor:pointer;
+  position:absolute; z-index:2; border:none; cursor:pointer; pointer-events:auto; touch-action:manipulation;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   width:min(calc(var(--blob-size) + 54px),100%);
   height:calc(var(--blob-size) * .72); min-height:80px; padding:var(--space-4) var(--space-5); text-align:center;
