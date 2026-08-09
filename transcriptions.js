@@ -6,6 +6,7 @@ Object.assign(window.HEBREW_TRANSCRIPTIONS,{
   'מרכיב':'марки́в'
 });
 Object.assign(window.HEBREW_TRANSCRIPTIONS,{
+  'קללות':'клало́т',
   'להירגע':'лехираге́а',
   'נרגע':'нирга́',
   'לבאס':'леваэ́с',
