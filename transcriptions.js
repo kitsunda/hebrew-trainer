@@ -12,3 +12,10 @@ Object.assign(window.HEBREW_TRANSCRIPTIONS,{
   'ביאס':'бие́с',
   'מבאס':'меваэ́с'
 });
+Object.assign(window.HEBREW_TRANSCRIPTIONS,{
+  'נכנס':'нихна́с',
+  'עף':'аф',
+  'ארגן':'ирге́н',
+  'הוא עף':'ху́ аф',
+  'הוא מודד את החדר':'ху́ моде́д е́т хахе́дер'
+});

@@ -10,3 +10,17 @@ window.NASTYA_VERB_FAMILIES.push(
   {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
   {id:'C:באס',meaning:'расстраивать, огорчать',infinitive:'לבאס',past:'ביאס',present:'מבאס',example:{h:'זה ממש מבאס אותי',r:'это меня очень расстраивает'},source:'Настя перек 2, 02.08.2026'}
 );
+
+Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='B:נכנס'),{
+  translations:{present:'вхожу'}
+});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='A:עף'),{
+  translations:{past:'улетел'},
+  example:{h:'הוא עף',t:'ху́ аф',r:'он улетел'}
+});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='A:מדד'),{
+  example:{h:'הוא מודד את החדר',t:'ху́ моде́д е́т хахе́дер',r:'он измеряет комнату'}
+});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='E:התרגש'),{
+  translations:{present:'волнуюсь'}
+});

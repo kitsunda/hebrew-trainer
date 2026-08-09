@@ -182,6 +182,8 @@ function russianPast3s(infinitive){
   return stem+'л';
 }
 function verbFormTranslation(family, form){
+  const explicit = family.translations?.[form.key];
+  if(explicit) return explicit;
   if(form.key==='infinitive') return verbSense(family.meaning,'infinitive');
   if(form.key==='past') return russianPast3s(verbSense(family.meaning,'past'));
   return russianPresent1s(verbSense(family.meaning,'infinitive'));
