@@ -4,7 +4,9 @@ window.LENYA_VERB_FAMILIES.push(
   {id:'E:התרשם',meaning:'впечатляться',infinitive:'להתרשם',past:'התרשם',present:'מתרשם'},
   {id:'F:הרוויח',meaning:'зарабатывать',infinitive:'להרוויח',past:'הרוויח',present:'מרוויח'},
   {id:'A:אסף',meaning:'собирать, забирать',infinitive:'לאסוף',past:'אסף',present:'אוסף'},
-  {id:'F:הרכיב',meaning:'собирать из деталей',infinitive:'להרכיב',past:'הרכיב',present:'מרכיב'}
+  {id:'F:הרכיב',meaning:'собирать из деталей',infinitive:'להרכיב',past:'הרכיב',present:'מרכיב'},
+  {id:'B:נרשם',meaning:'записываться, регистрироваться',infinitive:'להירשם',past:'נרשם',present:'נרשם',example:{h:'הוא נרשם לרופא',r:'он записался к врачу'},source:'Лео Иврит, занятие 06.08.2026'},
+  {id:'F:הקדים',meaning:'приходить раньше, опережать',infinitive:'להקדים',past:'הקדים',present:'מקדים',example:{h:'אני מעדיף להקדים לפגישה',r:'я предпочитаю приходить на встречу заранее'},source:'Лео Иврит, занятие 09.08.2026'}
 );
 window.NASTYA_VERB_FAMILIES.push(
   {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
