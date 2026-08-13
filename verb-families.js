@@ -10,7 +10,10 @@ window.LENYA_VERB_FAMILIES.push(
 );
 window.NASTYA_VERB_FAMILIES.push(
   {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
-  {id:'C:באס',meaning:'расстраивать, огорчать',infinitive:'לבאס',past:'ביאס',present:'מבאס',example:{h:'זה ממש מבאס אותי',r:'это меня очень расстраивает'},source:'Настя перек 2, 02.08.2026'}
+  {id:'C:באס',meaning:'расстраивать, огорчать',infinitive:'לבאס',past:'ביאס',present:'מבאס',example:{h:'זה ממש מבאס אותי',r:'это меня очень расстраивает'},source:'Настя перек 2, 02.08.2026'},
+  {id:'E:השתכר',meaning:'напиваться',infinitive:'להשתכר',past:'השתכר',present:'משתכר',example:{h:'הוא השתכר אתמול',r:'он вчера напился'},source:'Настя перек 2, 09.08.2026'},
+  {id:'B:נפרד',meaning:'расставаться',infinitive:'להיפרד',past:'נפרד',present:'נפרד',example:{h:'אני לא רוצה להיפרד ממך',r:'я не хочу с тобой расставаться'},source:'Настя перек 2, 09.08.2026'},
+  {id:'A:געש',meaning:'бушевать, кипеть',infinitive:'לגעוש',past:'געש',present:'גועש',example:{h:'הים גועש',r:'море бушует'},source:'Настя перек 2, 09.08.2026'}
 );
 
 Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='B:נכנס'),{
