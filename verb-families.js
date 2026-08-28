@@ -22,7 +22,10 @@ window.LENYA_VERB_FAMILIES.push(
   {id:'C:שלב',meaning:'сочетать, интегрировать',infinitive:'לשלב',past:'שילב',present:'משלב',translations:{past:'он совместил',present:'я совмещаю'},example:{h:'אני משלב עבודה ולימודים',r:'я совмещаю работу и учёбу'},source:'Лео Иврит, занятие 20.08.2026'},
   {id:'E:התבגר',meaning:'взрослеть',infinitive:'להתבגר',past:'התבגר',present:'מתבגר',translations:{past:'он повзрослел',present:'я взрослею'},example:{h:'אני מתבגר ולומד דברים חדשים',r:'я взрослею и узнаю новое'},source:'Лео Иврит, занятие 20.08.2026'},
   {id:'P:שאל',meaning:'спрашивать',infinitive:'לשאול',past:'שאל',present:'שואל',translations:{past:'он спросил',present:'я спрашиваю'},example:{h:'אני שואל מאיפה אתה',r:'я спрашиваю, откуда ты'},source:'Лео Иврит, занятие 23.08.2026'},
-  {id:'P:קבע',meaning:'назначать, определять',infinitive:'לקבוע',past:'קבע',present:'קובע',translations:{past:'он назначил',present:'я назначаю'},example:{h:'אני קובע פגישה למחר',r:'я назначаю встречу на завтра'},source:'Лео Иврит, занятие 23.08.2026'}
+  {id:'P:קבע',meaning:'назначать, определять',infinitive:'לקבוע',past:'קבע',present:'קובע',translations:{past:'он назначил',present:'я назначаю'},example:{h:'אני קובע פגישה למחר',r:'я назначаю встречу на завтра'},source:'Лео Иврит, занятие 23.08.2026'},
+  {id:'E:הצטער',meaning:'сожалеть',infinitive:'להצטער',past:'הצטער',present:'מצטער',translations:{past:'он сожалел',present:'я сожалею'},example:{h:'אני מצטער, לא ידעתי',r:'я сожалею, я не знал'},source:'Лео Иврит, занятие 27.08.2026'},
+  {id:'F:העדיף',meaning:'предпочитать',infinitive:'להעדיף',past:'העדיף',present:'מעדיף',translations:{past:'он предпочёл',present:'я предпочитаю'},example:{h:'אני מעדיף לשבת כאן',r:'я предпочитаю сидеть здесь'},source:'Лео Иврит, занятие 27.08.2026'},
+  {id:'E:הסתדר',meaning:'справляться; устраиваться',infinitive:'להסתדר',past:'הסתדר',present:'מסתדר',translations:{past:'он справился',present:'я справляюсь'},example:{h:'לא תודה, אני מסתדר',r:'нет, спасибо, я справляюсь'},source:'Лео Иврит, занятие 27.08.2026'}
 );
 window.NASTYA_VERB_FAMILIES.push(
   {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
