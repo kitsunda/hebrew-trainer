@@ -35,7 +35,10 @@ window.NASTYA_VERB_FAMILIES.push(
   {id:'A:געש',meaning:'бушевать, кипеть',infinitive:'לגעוש',past:'געש',present:'גועש',example:{h:'הים גועש',r:'море бушует'},source:'Настя перек 2, 09.08.2026'},
   {id:'F:המיס',meaning:'растапливать, расплавлять',infinitive:'להמיס',past:'המיס',present:'ממיס',example:{h:'צריך להמיס את החמאה',r:'нужно растопить масло'},source:'Настя перек 2, 16.08.2026'},
   {id:'E:התכונן',meaning:'готовиться',infinitive:'להתכונן',past:'התכונן',present:'מתכונן',example:{h:'אני מתכונן למבחן',r:'я готовлюсь к экзамену'},source:'Настя перек 2, 20.08.2026'},
-  {id:'A:צעק',meaning:'кричать',infinitive:'לצעוק',past:'צעק',present:'צועק',example:{h:'אני לא צועק, אני מדבר בקול רם',r:'я не кричу, я говорю громко'},source:'Настя перек 2, 20.08.2026'}
+  {id:'A:צעק',meaning:'кричать',infinitive:'לצעוק',past:'צעק',present:'צועק',example:{h:'אני לא צועק, אני מדבר בקול רם',r:'я не кричу, я говорю громко'},source:'Настя перек 2, 20.08.2026'},
+  {id:'A:מצא',meaning:'находить',infinitive:'למצוא',past:'מצא',present:'מוצא',translations:{past:'он нашёл',present:'я нахожу'},example:{h:'אני מוצא נוצות על האדמה',r:'я нахожу перья на земле'},source:'Настя перек 2, 23.08.2026'},
+  {id:'C:שחק',meaning:'играть',infinitive:'לשחק',past:'שיחק',present:'משחק',translations:{past:'он играл',present:'я играю'},example:{h:'אני משחק בגלילים',r:'я играю с рулонами'},source:'Настя перек 2, 23.08.2026'},
+  {id:'F:הרכיב',meaning:'собирать из деталей',infinitive:'להרכיב',past:'הרכיב',present:'מרכיב',translations:{past:'он собрал',present:'я собираю'},example:{h:'אני מרכיב בלגו',r:'я собираю LEGO'},source:'Настя перек 2, 23.08.2026'}
 );
 
 Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='B:נכנס'),{
