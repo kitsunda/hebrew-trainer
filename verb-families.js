@@ -25,8 +25,26 @@ window.LENYA_VERB_FAMILIES.push(
   {id:'P:קבע',meaning:'назначать, определять',infinitive:'לקבוע',past:'קבע',present:'קובע',translations:{past:'он назначил',present:'я назначаю'},example:{h:'אני קובע פגישה למחר',r:'я назначаю встречу на завтра'},source:'Лео Иврит, занятие 23.08.2026'},
   {id:'E:הצטער',meaning:'сожалеть',infinitive:'להצטער',past:'הצטער',present:'מצטער',translations:{past:'он сожалел',present:'я сожалею'},example:{h:'אני מצטער, לא ידעתי',r:'я сожалею, я не знал'},source:'Лео Иврит, занятие 27.08.2026'},
   {id:'F:העדיף',meaning:'предпочитать',infinitive:'להעדיף',past:'העדיף',present:'מעדיף',translations:{past:'он предпочёл',present:'я предпочитаю'},example:{h:'אני מעדיף לשבת כאן',r:'я предпочитаю сидеть здесь'},source:'Лео Иврит, занятие 27.08.2026'},
-  {id:'E:הסתדר',meaning:'справляться; устраиваться',infinitive:'להסתדר',past:'הסתדר',present:'מסתדר',translations:{past:'он справился',present:'я справляюсь'},example:{h:'לא תודה, אני מסתדר',r:'нет, спасибо, я справляюсь'},source:'Лео Иврит, занятие 27.08.2026'}
+  {id:'E:הסתדר',meaning:'справляться; устраиваться',infinitive:'להסתדר',past:'הסתדר',present:'מסתדר',translations:{past:'он справился',present:'я справляюсь'},example:{h:'לא תודה, אני מסתדר',r:'нет, спасибо, я справляюсь'},source:'Лео Иврит, занятие 27.08.2026'},
+  {id:'A:חפר',meaning:'копать; докучать разговорами',infinitive:'לחפור',past:'חפר',present:'חופר',translations:{past:'он копал; он докучал разговорами',present:'я копаю; я докучаю разговорами'},example:{h:'הוא ממש חופר',r:'он просто выносит мозг'},source:'Лео Иврит, занятие 30.08.2026'},
+  {id:'F:השתין',meaning:'мочиться',infinitive:'להשתין',past:'השתין',present:'משתין',translations:{past:'он помочился',present:'я мочусь'},example:{h:'אני צריך להשתין',r:'мне нужно помочиться'},source:'Лео Иврит, занятие 30.08.2026'},
+  {id:'E:התפנה',meaning:'освободиться; выйти в уборную',infinitive:'להתפנות',past:'התפנה',present:'מתפנה',translations:{past:'он освободился; он вышел в уборную',present:'я освобождаюсь; я выхожу в уборную'},example:{h:'אני צריך להתפנות',r:'мне нужно выйти в уборную'},source:'Лео Иврит, занятие 30.08.2026'},
+  {id:'A:פנה',meaning:'поворачивать; освобождать',infinitive:'לפנות',past:'פנה',present:'פונה',translations:{past:'он повернул; он освободил',present:'я поворачиваю; я освобождаю'},example:{h:'אפשר לפנות את השולחן?',r:'можно убрать со стола?'},source:'Лео Иврит, занятие 30.08.2026'},
+  {id:'C:סייע',meaning:'помогать, содействовать',infinitive:'לסייע',past:'סייע',present:'מסייע',translations:{past:'он помог',present:'я помогаю'},example:{h:'אני מסייע לילדים',r:'я помогаю детям'},source:'Лео Иврит, занятие 01.09.2026'},
+  {id:'C:בזבז',meaning:'тратить впустую',infinitive:'לבזבז',past:'בזבז',present:'מבזבז',translations:{past:'он потратил впустую',present:'я трачу впустую'},example:{h:'אני לא רוצה לבזבז זמן',r:'я не хочу тратить время впустую'},source:'Лео Иврит, занятие 01.09.2026'}
 );
+Object.assign(window.LENYA_VERB_FAMILIES.find(({id})=>id==='A:בא'),{
+  translations:{past:'он пришёл',present:'я прихожу'},
+  example:{h:'כדאי לבוא מוקדם',r:'стоит прийти пораньше'}
+});
+Object.assign(window.LENYA_VERB_FAMILIES.find(({id})=>id==='A:רשם'),{
+  translations:{past:'он записал',present:'я записываю'},
+  example:{h:'אני רושם רשימת קניות',r:'я записываю список покупок'}
+});
+Object.assign(window.LENYA_VERB_FAMILIES.find(({id})=>id==='E:התרשם'),{
+  translations:{past:'он впечатлился',present:'я впечатляюсь'},
+  example:{h:'אני מתרשם מהמקום',r:'я впечатлён этим местом'}
+});
 window.NASTYA_VERB_FAMILIES.push(
   {id:'B:נרגע',meaning:'успокаиваться',infinitive:'להירגע',past:'נרגע',present:'נרגע',example:{h:'אחרי השיחה הלחץ נרגע',r:'после разговора напряжение спало'},source:'Настя перек 2, 02.08.2026'},
   {id:'C:באס',meaning:'расстраивать, огорчать',infinitive:'לבאס',past:'ביאס',present:'מבאס',example:{h:'זה ממש מבאס אותי',r:'это меня очень расстраивает'},source:'Настя перек 2, 02.08.2026'},
