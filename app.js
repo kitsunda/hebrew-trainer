@@ -695,10 +695,12 @@ function renderTopics(){
     chip.addEventListener('click', ()=>{
       chip.classList.add('launching');
       setTimeout(()=>{
-        const started = startSession(chip.dataset.key);
-        /* Если сегодня нечего запускать, не оставляем кнопку в состоянии
-           «нажато» — иначе из-за pointer-events она кажется сломанной. */
-        if(!started) chip.classList.remove('launching');
+        try {
+          startSession(chip.dataset.key);
+        } finally {
+          // Кнопка должна снова работать после выхода из тренировки.
+          chip.classList.remove('launching');
+        }
       }, reduceMotion ? 0 : 160);
     });
   });

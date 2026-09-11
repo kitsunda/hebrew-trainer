@@ -72,3 +72,16 @@ Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='A:מדד'),{
 Object.assign(window.NASTYA_VERB_FAMILIES.find(({id})=>id==='E:התרגש'),{
   translations:{present:'волнуюсь'}
 });
+
+window.NASTYA_VERB_FAMILIES.push(
+{"id":"A:קלט","meaning":"воспринимать; усваивать","infinitive":"לקלוט","past":"קלט","present":"קולט","translations":{"past":"он воспринял","present":"я воспринимаю"},"example":{"h":"אני קולט את מה שאתה אומר","r":"я понимаю, что ты говоришь"},"source":"Настя перек 2, 27.08.2026","importedAt":"2026-09-11"},
+{"id":"A:שתק","meaning":"молчать","infinitive":"לשתוק","past":"שתק","present":"שותק","translations":{"past":"он молчал","present":"я молчу"},"example":{"h":"אני שותק ומקשיב","r":"я молчу и слушаю"},"source":"Настя перек 2, 27.08.2026","importedAt":"2026-09-11"},
+{"id":"E:התבייש","meaning":"стесняться; стыдиться","infinitive":"להתבייש","past":"התבייש","present":"מתבייש","translations":{"past":"он стеснялся","present":"я стесняюсь"},"example":{"h":"אני מתבייש לשאול","r":"я стесняюсь спросить"},"source":"Настя перек 2, 27.08.2026","importedAt":"2026-09-11"},
+{"id":"E:התרחב","meaning":"расширяться","infinitive":"להתרחב","past":"התרחב","present":"מתרחב","translations":{"past":"он расширился","present":"я расширяюсь"},"example":{"h":"הכביש מתרחב כאן","r":"здесь дорога расширяется"},"source":"Настя перек 2, 30.08.2026","importedAt":"2026-09-11"},
+{"id":"C:שפר","meaning":"улучшать","infinitive":"לשפר","past":"שיפר","present":"משפר","translations":{"past":"он улучшил","present":"я улучшаю"},"example":{"h":"אני משפר את העברית שלי","r":"я улучшаю свой иврит"},"source":"Настя перек 2, 03.09.2026","importedAt":"2026-09-11"}
+);
+
+Object.assign(window.NASTYA_VERB_FAMILIES.find(f=>f.infinitive==="לזרום"),{"translations":{"past":"он тёк","present":"я теку"},"example":{"h":"המים זורמים בנחל","r":"вода течёт в ручье"},"source":"Настя перек 2, 27.08.2026","importedAt":"2026-09-11"});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(f=>f.infinitive==="לחקור"),{"translations":{"past":"он исследовал","present":"я исследую"},"example":{"h":"אני חוקר את הנושא","r":"я исследую эту тему"},"source":"Настя перек 2, 30.08.2026","importedAt":"2026-09-11"});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(f=>f.infinitive==="לגרום"),{"translations":{"past":"он вызвал","present":"я вызываю"},"example":{"h":"הרעש גורם לי לכאב ראש","r":"от шума у меня болит голова"},"source":"Настя перек 2, 30.08.2026","importedAt":"2026-09-11"});
+Object.assign(window.NASTYA_VERB_FAMILIES.find(f=>f.infinitive==="להתעורר"),{"translations":{"past":"он проснулся","present":"я просыпаюсь"},"example":{"h":"אני מתעורר בלי שעון מעורר","r":"я просыпаюсь без будильника"},"source":"Настя перек 2, 03.09.2026","importedAt":"2026-09-11"});
