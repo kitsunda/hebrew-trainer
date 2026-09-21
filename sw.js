@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'hebrew-trainer-v30';
+const CACHE_VERSION = 'hebrew-trainer-v31';
 const APP_SHELL = [
   './',
   './index.html',
